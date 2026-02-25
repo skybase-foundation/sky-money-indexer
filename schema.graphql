@@ -1,0 +1,1146 @@
+type Slate {
+  "Unique Slate ID, produced by hashing the addresses in the slate"
+  id: ID!
+  "Transaction hash of the Slate creation"
+  txnHash: String!
+  "Block number slate was created "
+  creationBlock: BigInt!
+  "Timestamp of block slate was created in"
+  creationTime: BigInt!
+
+  "Spells that are on this slate (stored as spell IDs)"
+  yays: [String!]!
+}
+
+type SlateV2 {
+  "Unique Slate ID, produced by hashing the addresses in the slate"
+  id: ID!
+  "Transaction hash of the Slate creation"
+  txnHash: String!
+  "Block number slate was created "
+  creationBlock: BigInt!
+  "Timestamp of block slate was created in"
+  creationTime: BigInt!
+
+  "Spells that are on this slate (stored as spell IDs)"
+  yays: [String!]!
+}
+
+# Also referred to as Executive Proposal
+type Spell {
+  "Spell's contract address"
+  id: ID!
+  "Spell description"
+  description: String!
+  "State of the spell"
+  state: SpellState!
+  "Block number spell was created in"
+  creationBlock: BigInt!
+  "Timestamp of block spell was created in"
+  creationTime: BigInt!
+  "Timestamp of spell expiry"
+  expiryTime: BigInt!
+  "Transaction hash of Spell lift"
+  liftedTxnHash: String
+  "Block number spell was lifted in"
+  liftedBlock: BigInt
+  "Timestamp of Spell lift"
+  liftedTime: BigInt
+  "Voting power when lifted"
+  liftedWith: BigInt
+  "Transaction hash of Spell scheduled"
+  scheduledTxnHash: String
+  "Block number spell was scheduled in"
+  scheduledBlock: BigInt
+  "Timestamp of Spell scheduled"
+  scheduledTime: BigInt
+  "Transaction hash of Spell cast"
+  castTxnHash: String
+  "Block number spell was cast in"
+  castBlock: BigInt
+  "Timestamp of Spell cast"
+  castTime: BigInt
+  "Voting power when cast"
+  castWith: BigInt
+  "Number of votes for the Spell"
+  totalVotes: BigInt!
+  "Weighted voting power for the Spell"
+  totalWeightedVotes: BigInt!
+}
+
+# Also referred to as Executive Proposal
+type SpellV2 {
+  "Spell's contract address"
+  id: ID!
+  "Spell description"
+  description: String!
+  "State of the spell"
+  state: SpellState!
+  "Block number spell was created in"
+  creationBlock: BigInt!
+  "Timestamp of block spell was created in"
+  creationTime: BigInt!
+  "Timestamp of spell expiry"
+  expiryTime: BigInt!
+  "Transaction hash of Spell lift"
+  liftedTxnHash: String
+  "Block number spell was lifted in"
+  liftedBlock: BigInt
+  "Timestamp of Spell lift"
+  liftedTime: BigInt
+  "Voting power when lifted"
+  liftedWith: BigInt
+  "Transaction hash of Spell scheduled"
+  scheduledTxnHash: String
+  "Block number spell was scheduled in"
+  scheduledBlock: BigInt
+  "Timestamp of Spell scheduled"
+  scheduledTime: BigInt
+  "Transaction hash of Spell cast"
+  castTxnHash: String
+  "Block number spell was cast in"
+  castBlock: BigInt
+  "Timestamp of Spell cast"
+  castTime: BigInt
+  "Voting power when cast"
+  castWith: BigInt
+  "Number of votes for the Spell"
+  totalVotes: BigInt!
+  "Weighted voting power for the Spell"
+  totalWeightedVotes: BigInt!
+}
+
+enum SpellState {
+  ACTIVE
+  LIFTED
+  SCHEDULED
+  CAST
+}
+
+type DelegateAdmin {
+  "A delegate admin is an address that controls a delegate contract"
+  id: String!
+
+  "Delegate contracts addresses"
+  delegateContract: Delegate!
+}
+
+type Delegate {
+  "A delegate is a contract owned by an address, Id is the address of the delegate contract"
+  id: String!
+  "Voter entity of the delegate"
+  voter: Voter!
+  "Address of the delegate owner"
+  ownerAddress: String!
+  "Delegations that this contract has received (stored as delegation IDs)"
+  delegations: [String!]!
+  "Delegation history (stored as delegation history IDs)"
+  delegationHistory: [String!]!
+  "Total amount delegated"
+  totalDelegated: BigInt!
+  "Number of token holders delegate represents"
+  delegators: Int!
+  "Transaction hash of delegate contract creation"
+  txnHash: String!
+  "Block time change happened"
+  blockTimestamp: BigInt!
+  "Block number of event"
+  blockNumber: BigInt!
+  "Delegate contract version"
+  version: String!
+}
+
+type VoteProxy {
+  "A proxy is a contract owned by an address, Id is the address of the proxy contract"
+  id: String!
+
+  hot: String!
+
+  cold: String!
+}
+
+type Voter {
+  "A Voter is any address that has participated in governance, a proxy contract or a delegate contract"
+  id: String!
+  "Is a vote delegate contract"
+  isVoteDelegate: Boolean
+  "Is a vote proxy contract"
+  isVoteProxy: Boolean
+  "Delegate admin is the address that controls a Vote Delegate contract"
+  delegateContract: Delegate
+  "Proxy contract"
+  proxyContract: VoteProxy
+  "Voter voting power expressed in the smallest unit of the token"
+  mkrLockedInChiefRaw: BigInt!
+  "Voter voting power expressed as a BigDecimal normalized value"
+  mkrLockedInChief: BigDecimal!
+  "Voter voting power expressed in the smallest unit of the token"
+  skyLockedInChiefRaw: BigInt!
+  "Voter voting power expressed as a BigDecimal normalized value"
+  skyLockedInChief: BigDecimal!
+  "Current slate of spells voter is voting for on the v1 chief (stored as spell IDs)"
+  currentSpells: [String!]!
+  "Current slate of spells voter is voting for on the v2 chief (stored as spell IDs)"
+  currentSpellsV2: [String!]!
+  "Number of spells voted on"
+  numberExecutiveVotes: Int!
+  "Number of spells voted on for the v2 chief"
+  numberExecutiveVotesV2: Int!
+  "Number of polls voted on"
+  numberPollVotes: Int!
+  "Last time voted"
+  lastVotedTimestamp: BigInt!
+}
+
+type ArbitrumVoter {
+  "A Voter is any address that has participated in governance on Arbitrum"
+  id: String!
+  "Last time voted"
+  lastVotedTimestamp: BigInt!
+  "Number of polls voted on"
+  numberPollVotes: Int!
+}
+
+type Delegation {
+  "delegate-delegator"
+  id: String!
+  "Voter entity of the delegator"
+  delegator: String!
+  "Total amount delegated"
+  amount: BigInt!
+  "Last time updated"
+  timestamp: BigInt!
+  "Delegate contract"
+  delegate: Delegate!
+}
+
+type DelegationHistory {
+  "delegate-delegator-date"
+  id: String!
+  "Voter entity of the delegator"
+  delegator: String!
+  "Change in total amount, can be negative"
+  amount: BigInt!
+  "Accumulated total amount"
+  accumulatedAmount: BigInt!
+  "Time it happened"
+  timestamp: BigInt!
+  "Block number"
+  blockNumber: BigInt!
+  "Transaction hash"
+  txnHash: String!
+  "Delegate contract"
+  delegate: Delegate!
+  "Is a lockstake delegation"
+  isLockstake: Boolean!
+  "Is a staking engine delegation"
+  isStakingEngine: Boolean!
+}
+
+type ExecutiveVotingPowerChange {
+  "Unique entity used to keep track of voting power delta"
+  id: ID!
+  "Token addresss"
+  tokenAddress: String
+  "Token address for voter"
+  voter: Voter!
+  "Sender of the voting power change transaction"
+  previousBalance: BigInt!
+  "New voting power of delegate"
+  newBalance: BigInt!
+  "amount can be negative or positive"
+  amount: BigInt!
+  "Block time change happened"
+  blockTimestamp: BigInt!
+  "Transaction hash of the voting power change"
+  txnHash: String!
+  "Log index for delegate voting power change"
+  logIndex: BigInt!
+  "Block number of event"
+  blockNumber: BigInt!
+}
+
+type ExecutiveVotingPowerChangeV2 {
+  "Unique entity used to keep track of voting power delta"
+  id: ID!
+  "Token addresss"
+  tokenAddress: String
+  "Token address for voter"
+  voter: Voter!
+  "Sender of the voting power change transaction"
+  previousBalance: BigInt!
+  "New voting power of delegate"
+  newBalance: BigInt!
+  "amount can be negative or positive"
+  amount: BigInt!
+  "Block time change happened"
+  blockTimestamp: BigInt!
+  "Transaction hash of the voting power change"
+  txnHash: String!
+  "Log index for delegate voting power change"
+  logIndex: BigInt!
+  "Block number of event"
+  blockNumber: BigInt!
+}
+
+type ExecutiveVote {
+  "Spell ID + Voter ID"
+  id: ID!
+  "Voting weight expressed in the vote"
+  weight: BigInt!
+  "Reason for voting choice"
+  reason: String
+  "Voter that emitted the vote"
+  voter: Voter!
+  "spell that is being voted on"
+  spell: Spell!
+  "Block number vote is cast in"
+  block: BigInt!
+  "Timestamp of block vote was cast in"
+  blockTime: BigInt!
+  "Transaction hash of the vote"
+  txnHash: String!
+  "Log index for event"
+  logIndex: BigInt!
+}
+
+type ExecutiveVoteV2 {
+  "Spell ID + Voter ID"
+  id: ID!
+  "Voting weight expressed in the vote"
+  weight: BigInt!
+  "Reason for voting choice"
+  reason: String
+  "Voter that emitted the vote"
+  voter: Voter!
+  "spell that is being voted on"
+  spell: SpellV2!
+  "Block number vote is cast in"
+  block: BigInt!
+  "Timestamp of block vote was cast in"
+  blockTime: BigInt!
+  "Transaction hash of the vote"
+  txnHash: String!
+  "Log index for event"
+  logIndex: BigInt!
+}
+
+# Polling Entities
+type PollVote {
+  "Poll ID + Voter ID"
+  id: String!
+  "Voting choice expressed in the vote"
+  choice: BigInt!
+  "Voter that emitted the vote"
+  voter: Voter!
+  "Poll that is being voted on"
+  poll: Poll!
+  "Block number vote is cast in"
+  block: BigInt!
+  "Timestamp of block vote was cast in"
+  blockTime: BigInt!
+  "Transaction hash of the vote"
+  txnHash: String!
+}
+
+type ArbitrumPollVote {
+  "Poll ID + Voter ID + Block Number"
+  id: String!
+  "Voting choice expressed in the vote"
+  choice: BigInt!
+  "Voter that emitted the vote"
+  voter: ArbitrumVoter!
+  "Poll that is being voted on"
+  poll: ArbitrumPoll!
+  "Block number vote is cast in"
+  block: BigInt!
+  "Timestamp of block vote was cast in"
+  blockTime: BigInt!
+  "Transaction hash of the vote"
+  txnHash: String!
+}
+
+type Poll {
+  "Poll id"
+  id: String!
+  "Poll creator"
+  creator: String
+  "Poll block created"
+  blockCreated: BigInt
+  "Poll block withdrawn"
+  blockWithdrawn: BigInt
+  "Poll withdrawn by"
+  withdrawnBy: String
+  "Poll start date"
+  startDate: BigInt
+  "Poll end date"
+  endDate: BigInt
+  "Poll multiHash"
+  multiHash: String
+  "Poll URL"
+  url: String
+}
+
+type ArbitrumPoll {
+  "Poll id"
+  id: String!
+  "Poll creator"
+  creator: String
+  "Poll block created"
+  blockCreated: BigInt
+  "Poll block withdrawn"
+  blockWithdrawn: BigInt
+  "Poll withdrawn by"
+  withdrawnBy: String
+  "Poll start date"
+  startDate: BigInt
+  "Poll end date"
+  endDate: BigInt
+  "Poll multiHash"
+  multiHash: String
+  "Poll URL"
+  url: String
+}
+
+type ContentHashRegistry {
+  id: ID!
+  blockNumber: Int!
+  transactionID: String!
+  hash: String!
+  address: String!
+  node: String!
+  nodeHexString: String!
+  hashHexString: String!
+  cid: String!
+}
+
+
+type VotingStrategy {
+  id: String!
+  name: String!
+  description: String!
+  delegates: [String!]!
+}
+
+type VotingCommittee {
+  id: String!
+  name: String!
+  description: String
+  image: String
+  externalProfileURL: String
+  strategies: [String!]!
+}
+
+type Reward {
+  id: ID!
+  totalSupplied: BigInt!
+  totalRewardsClaimed: BigInt!
+  lockstakeActive: Boolean!
+  stakingEngineActive: Boolean!
+}
+
+type RewardSupplier {
+  id: ID!
+  user: String!
+  reward: Reward!
+  amount: BigInt!
+}
+
+type RewardClaim {
+  id: ID!
+  reward: Reward!
+  user: String!
+  amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type RewardSupply {
+  id: ID!
+  reward: Reward!
+  user: String!
+  amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type RewardWithdraw {
+  id: ID!
+  reward: Reward!
+  user: String!
+  amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type RewardReferral {
+  id: ID!
+  referral: Int!
+  reward: Reward!
+  user: String!
+  amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type TvlUpdate {
+  id: ID!
+  reward: Reward!
+  amount: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SavingsSupply {
+  id: ID!
+  sender: String!
+  owner: String!
+  assets: BigInt!
+  shares: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SavingsWithdraw {
+  id: ID!
+  sender: String!
+  receiver: String!
+  owner: String!
+  assets: BigInt!
+  shares: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SavingsReferral {
+  id: ID!
+  referral: Int!
+  owner: String!
+  assets: BigInt!
+  shares: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SavingsSupplier {
+  id: ID!
+}
+
+type DaiToUsdsUpgrade {
+  id: ID!
+  caller: String!
+  usr: String!
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type UsdsToDaiRevert {
+  id: ID!
+  caller: String!
+  usr: String!
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type MkrToSkyUpgrade {
+  id: ID!
+  caller: String!
+  usr: String!
+  mkrAmt: BigInt!
+  skyAmt: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type MkrToSkyUpgradeV2 {
+  id: ID!
+  caller: String!
+  usr: String!
+  mkrAmt: BigInt!
+  skyAmt: BigInt!
+  skyFee: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SkyToMkrRevert {
+  id: ID!
+  caller: String!
+  usr: String!
+  skyAmt: BigInt!
+  mkrAmt: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type Total {
+  id: ID!
+  total: BigInt!
+}
+
+type Rely {
+  id: ID!
+  usr: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type Deny {
+  id: ID!
+  usr: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type FileUint {
+  id: ID!
+  what: String!
+  data: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type FileAddress {
+  id: ID!
+  what: String!
+  data: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type Kick {
+  id: ID!
+  top: BigInt!
+  tab: BigInt!
+  lot: BigInt!
+  usr: String!
+  kpr: String!
+  coin: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type Take {
+  id: ID!
+  max: BigInt!
+  price: BigInt!
+  owe: BigInt!
+  tab: BigInt!
+  lot: BigInt!
+  usr: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type Redo {
+  id: ID!
+  top: BigInt!
+  tab: BigInt!
+  lot: BigInt!
+  usr: String!
+  kpr: String!
+  coin: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type Yank {
+  id: ID!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type LockstakeMkrRely {
+  id: ID!
+  usr: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type LockstakeMkrDeny {
+  id: ID!
+  usr: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type LockstakeMkrApproval {
+  id: ID!
+  owner: String!
+  spender: String!
+  value: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type LockstakeMkrTransfer {
+  id: ID!
+  from: String!
+  to: String!
+  value: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealRely {
+  id: ID!
+  usr: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealDeny {
+  id: ID!
+  usr: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealFile {
+  id: ID!
+  what: String!
+  data: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealAddReward {
+  id: ID!
+  reward: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealDelReward {
+  id: ID!
+  reward: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealOpen {
+  id: ID!
+  owner: String!
+  index: BigInt!
+  urn: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealHope {
+  id: ID!
+  owner: String!
+  index: BigInt!
+  usr: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealNope {
+  id: ID!
+  owner: String!
+  index: BigInt!
+  usr: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealSelectVoteDelegate {
+  id: ID!
+  urn: SealUrn
+  index: BigInt!
+  voteDelegate: Delegate
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealSelectReward {
+  id: ID!
+  index: BigInt!
+  urn: SealUrn
+  reward: Reward
+  ref: Int!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealLock {
+  id: ID!
+  index: BigInt!
+  urn: SealUrn
+  wad: BigInt!
+  ref: Int!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealLockSky {
+  id: ID!
+  index: BigInt!
+  urn: SealUrn
+  wad: BigInt!
+  ref: Int!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealFree {
+  id: ID!
+  urn: SealUrn
+  index: BigInt!
+  to: String!
+  wad: BigInt!
+  freed: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealFreeSky {
+  id: ID!
+  urn: SealUrn
+  index: BigInt!
+  to: String!
+  skyWad: BigInt!
+  skyFreed: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealFreeNoFee {
+  id: ID!
+  urn: SealUrn
+  index: BigInt!
+  to: String!
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealDraw {
+  id: ID!
+  urn: SealUrn
+  index: BigInt!
+  to: String!
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealWipe {
+  id: ID!
+  urn: SealUrn
+  index: BigInt!
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealGetReward {
+  id: ID!
+  urn: SealUrn
+  index: BigInt!
+  reward: String!
+  to: String!
+  amt: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealOnKick {
+  id: ID!
+  urn: SealUrn
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealOnTake {
+  id: ID!
+  urn: SealUrn
+  who: String!
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealOnRemove {
+  id: ID!
+  urn: SealUrn
+  sold: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SealUrn {
+  id: ID!
+  owner: String!
+  index: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  reward: Reward
+  voteDelegate: Delegate
+  mkrLocked: BigInt!
+  usdsDebt: BigInt!
+  skyLocked: BigInt!
+  auctionsCount: BigInt!
+}
+
+type LockstakeMigrate {
+  id: ID!
+  oldOwner: String!
+  oldIndex: BigInt!
+  newOwner: String!
+  newIndex: BigInt!
+  ink: BigInt!
+  debt: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StakingOpen {
+  id: ID!
+  owner: String!
+  index: BigInt!
+  urn: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StakingSelectVoteDelegate {
+  id: ID!
+  urn: StakingUrn
+  index: BigInt!
+  voteDelegate: Delegate
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StakingSelectReward {
+  id: ID!
+  index: BigInt!
+  urn: StakingUrn
+  reward: Reward
+  ref: Int!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StakingLock {
+  id: ID!
+  index: BigInt!
+  urn: StakingUrn
+  wad: BigInt!
+  ref: Int!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StakingFree {
+  id: ID!
+  urn: StakingUrn
+  index: BigInt!
+  to: String!
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StakingFreeNoFee {
+  id: ID!
+  urn: StakingUrn
+  index: BigInt!
+  to: String!
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StakingDraw {
+  id: ID!
+  urn: StakingUrn
+  index: BigInt!
+  to: String!
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StakingWipe {
+  id: ID!
+  urn: StakingUrn
+  index: BigInt!
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StakingGetReward {
+  id: ID!
+  urn: StakingUrn
+  index: BigInt!
+  reward: String!
+  to: String!
+  amt: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StakingOnKick {
+  id: ID!
+  urn: StakingUrn
+  wad: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StakingUrn {
+  id: ID!
+  owner: String!
+  index: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  reward: Reward
+  voteDelegate: Delegate
+  usdsDebt: BigInt!
+  skyLocked: BigInt!
+  auctionsCount: BigInt!
+}
+
+type Bark {
+  id: String!
+  ilk: String!
+  urn: String!
+  ink: BigInt!
+  art: BigInt!
+  due: BigInt!
+  clip: String!
+  clipperId: BigInt
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  sealUrn: SealUrn
+  stakingUrn: StakingUrn
+}
+
+type Swap {
+  id: ID!
+  assetIn: String!
+  assetOut: String!
+  receiver: String!
+  sender: String!
+  amountIn: BigInt!
+  amountOut: BigInt!
+  referralCode: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StusdsDeposit {
+  id: ID!
+  sender: String!
+  owner: String!
+  assets: BigInt!
+  shares: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StusdsWithdraw {
+  id: ID!
+  sender: String!
+  receiver: String!
+  owner: String!
+  assets: BigInt!
+  shares: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type StusdsReferral {
+  id: ID!
+  referral: Int!
+  owner: String!
+  assets: BigInt!
+  shares: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type CurveTokenExchange {
+  id: ID!
+  buyer: String!
+  soldId: BigInt!
+  soldTokenAddress: String!
+  amountSold: BigInt!
+  boughtId: BigInt!
+  boughtTokenAddress: String!
+  amountBought: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}

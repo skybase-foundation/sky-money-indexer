@@ -1,0 +1,22 @@
+{
+  "name": "sky-money-indexer",
+  "scripts": {
+    "codegen": "envio codegen",
+    "dev": "envio dev",
+    "start": "envio start",
+    "stop": "envio stop",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "envio": "^2.32.3",
+    "viem": "^2.46.2"
+  },
+  "optionalDependencies": {
+    "generated": "./generated"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "typescript": "^5.9.3",
+    "vitest": "^2.0.0"
+  }
+}

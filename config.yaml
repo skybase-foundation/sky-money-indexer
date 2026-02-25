@@ -1,0 +1,852 @@
+name: sky-indexer
+description: Sky Protocol Governance & DeFi Indexer
+unordered_multichain_mode: true
+rollback_on_reorg: true
+preload_handlers: true
+schema: schema.graphql
+contracts:
+  # === Governance: DSChief (V1) ===
+  - name: DSChief
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/DSChief.json
+    events:
+      - event: 'LogNote(bytes4 sig, address guy, bytes32 foo, bytes32 bar, uint256 wad, bytes fax)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Governance: DSChief (V2) ===
+  - name: DSChiefV2
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/DSChiefV2.json
+    events:
+      - event: 'Lock(address indexed usr, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Free(address indexed usr, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Vote(address indexed usr, bytes32 indexed slate)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Lift(address indexed whom)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Governance: Polling ===
+  - name: PollingEmitter
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/PollingEmitter.json
+    events:
+      - event: 'Voted(address indexed voter, uint256 indexed pollId, uint256 indexed optionId)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'PollCreated(address indexed creator, uint256 blockCreated, uint256 indexed pollId, uint256 startDate, uint256 endDate, string multiHash, string url)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'PollWithdrawn(address indexed creator, uint256 blockWithdrawn, uint256 pollId)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Governance: Polling V2 (same ABI, different address) ===
+  - name: PollingEmitterV2
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/PollingEmitter.json
+    events:
+      - event: 'Voted(address indexed voter, uint256 indexed pollId, uint256 indexed optionId)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'PollCreated(address indexed creator, uint256 blockCreated, uint256 indexed pollId, uint256 startDate, uint256 endDate, string multiHash, string url)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'PollWithdrawn(address indexed creator, uint256 blockWithdrawn, uint256 pollId)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Governance: Arbitrum Polling ===
+  - name: PollingEmitterArbitrum
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/PollingEmitter.json
+    events:
+      - event: 'Voted(address indexed voter, uint256 indexed pollId, uint256 indexed optionId)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'PollCreated(address indexed creator, uint256 blockCreated, uint256 indexed pollId, uint256 startDate, uint256 endDate, string multiHash, string url)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Delegate Factories ===
+  - name: DelegateFactory
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/DelegateFactory.json
+    events:
+      - event: 'CreateVoteDelegate(address indexed delegate, address indexed voteDelegate)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: DelegateFactoryV2
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/DelegateFactoryV2.json
+    events:
+      - event: 'CreateVoteDelegate(address indexed delegate, address indexed voteDelegate)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: DelegateFactoryV3
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/DelegateFactoryV3.json
+    events:
+      - event: 'CreateVoteDelegate(address indexed delegate, address indexed voteDelegate)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Dynamic: Vote Delegate Templates (no address - discovered via factories) ===
+  - name: VoteDelegate
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/VoteDelegate.json
+    events:
+      - event: 'Lock(address indexed usr, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Free(address indexed usr, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: VoteDelegateV2
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/VoteDelegateV2.json
+    events:
+      - event: 'Lock(address indexed usr, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Free(address indexed usr, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'ReserveHatch()'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: VoteDelegateV3
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/VoteDelegateV3.json
+    events:
+      - event: 'Lock(address indexed usr, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Free(address indexed usr, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Rewards Contracts (all share the same handler) ===
+  - name: RewardsUsdsClePoints
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/rewards/RewardsUsdsClePoints.json
+    events:
+      - event: 'Staked(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdrawn(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: RewardsUsdsSky
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/rewards/RewardsUsdsSky.json
+    events:
+      - event: 'RewardPaid(address indexed user, uint256 reward)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Staked(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdrawn(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: RewardsUsdsSpk
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/rewards/RewardsUsdsSpk.json
+    events:
+      - event: 'RewardPaid(address indexed user, uint256 reward)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Staked(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdrawn(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: RewardsLsmkrUsds
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/rewards/RewardsLsmkrUsds.json
+    events:
+      - event: 'RewardPaid(address indexed user, uint256 reward)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Staked(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdrawn(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: RewardsLsskyUsds
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/rewards/RewardsLsskyUsds.json
+    events:
+      - event: 'RewardPaid(address indexed user, uint256 reward)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Staked(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdrawn(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: RewardsLsskySpk
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/rewards/RewardsLsskySpk.json
+    events:
+      - event: 'RewardPaid(address indexed user, uint256 reward)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Staked(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdrawn(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: RewardsLsskySky
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/rewards/RewardsLsskySky.json
+    events:
+      - event: 'RewardPaid(address indexed user, uint256 reward)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Staked(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdrawn(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Savings & Staking ===
+  - name: SavingsUsds
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/SavingsUsds.json
+    events:
+      - event: 'Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdraw(address indexed sender, address indexed receiver, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: Stusds
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/Stusds.json
+    events:
+      - event: 'Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdraw(address indexed sender, address indexed receiver, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Token Conversions ===
+  - name: DaiUsds
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/DaiUsds.json
+    events:
+      - event: 'DaiToUsds(address indexed caller, address indexed usr, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'UsdsToDai(address indexed caller, address indexed usr, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: MkrSky
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/MkrSky.json
+    events:
+      - event: 'MkrToSky(address indexed caller, address indexed usr, uint256 mkrAmt, uint256 skyAmt)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'SkyToMkr(address indexed caller, address indexed usr, uint256 skyAmt, uint256 mkrAmt)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: MkrSkyV2
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/MkrSkyV2.json
+    events:
+      - event: 'MkrToSky(address indexed caller, address indexed usr, uint256 mkrAmt, uint256 skyAmt, uint256 skyFee)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Lockstake ===
+  - name: LockstakeClipper
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/LockstakeClipper.json
+    events:
+      - event: 'Rely(address indexed usr)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Deny(address indexed usr)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'File(bytes32 indexed what, uint256 data)'
+        name: 'FileUint'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'File(bytes32 indexed what, address data)'
+        name: 'FileAddress'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Kick(uint256 indexed id, uint256 top, uint256 tab, uint256 lot, address indexed usr, address indexed kpr, uint256 coin)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Take(uint256 indexed id, uint256 max, uint256 price, uint256 owe, uint256 tab, uint256 lot, address indexed usr)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Redo(uint256 indexed id, uint256 top, uint256 tab, uint256 lot, address indexed usr, address indexed kpr, uint256 coin)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Yank(uint256 id)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: LockstakeMkr
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/LockstakeMkr.json
+    events:
+      - event: 'Rely(address indexed usr)'
+        name: 'LockstakeMkrRely'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Deny(address indexed usr)'
+        name: 'LockstakeMkrDeny'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Approval(address indexed owner, address indexed spender, uint256 value)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Transfer(address indexed from, address indexed to, uint256 value)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: LockstakeEngine
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/LockstakeEngine.json
+    events:
+      - event: 'Rely(address indexed usr)'
+        name: 'SealRely'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Deny(address indexed usr)'
+        name: 'SealDeny'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Hope(address indexed owner, uint256 indexed index, address indexed usr)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Nope(address indexed owner, uint256 indexed index, address indexed usr)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Open(address indexed owner, uint256 indexed index, address urn)'
+        name: 'SealOpen'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'SelectVoteDelegate(address indexed owner, uint256 indexed index, address indexed voteDelegate)'
+        name: 'SealSelectVoteDelegate'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'SelectFarm(address indexed owner, uint256 indexed index, address indexed farm, uint16 ref)'
+        name: 'SealSelectFarm'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Lock(address indexed owner, uint256 indexed index, uint256 wad, uint16 ref)'
+        name: 'SealLock'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'LockSky(address indexed owner, uint256 indexed index, uint256 skyWad, uint16 ref)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Free(address indexed owner, uint256 indexed index, address to, uint256 wad, uint256 freed)'
+        name: 'SealFree'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'FreeSky(address indexed owner, uint256 indexed index, address to, uint256 skyWad, uint256 skyFreed)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'FreeNoFee(address indexed owner, uint256 indexed index, address to, uint256 wad)'
+        name: 'SealFreeNoFee'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Draw(address indexed owner, uint256 indexed index, address to, uint256 wad)'
+        name: 'SealDraw'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Wipe(address indexed owner, uint256 indexed index, uint256 wad)'
+        name: 'SealWipe'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'GetReward(address indexed owner, uint256 indexed index, address indexed farm, address to, uint256 amt)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'OnKick(address indexed urn, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'OnTake(address indexed urn, address indexed who, uint256 wad)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'OnRemove(address indexed urn, uint256 sold, uint256 burn, uint256 refund)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'AddFarm(address farm)'
+        name: 'SealAddFarm'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'DelFarm(address farm)'
+        name: 'SealDelFarm'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Staking Engine ===
+  - name: StakingEngine
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/StakingEngine.json
+    events:
+      - event: 'Open(address indexed owner, uint256 indexed index, address urn)'
+        name: 'StakingOpen'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'SelectVoteDelegate(address indexed owner, uint256 indexed index, address indexed voteDelegate)'
+        name: 'StakingSelectVoteDelegate'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'SelectFarm(address indexed owner, uint256 indexed index, address indexed farm, uint16 ref)'
+        name: 'StakingSelectFarm'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Lock(address indexed owner, uint256 indexed index, uint256 wad, uint16 ref)'
+        name: 'StakingLock'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Free(address indexed owner, uint256 indexed index, address to, uint256 wad, uint256 freed)'
+        name: 'StakingFree'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'FreeNoFee(address indexed owner, uint256 indexed index, address to, uint256 wad)'
+        name: 'StakingFreeNoFee'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Draw(address indexed owner, uint256 indexed index, address to, uint256 wad)'
+        name: 'StakingDraw'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Wipe(address indexed owner, uint256 indexed index, uint256 wad)'
+        name: 'StakingWipe'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'GetReward(address indexed owner, uint256 indexed index, address indexed farm, address to, uint256 amt)'
+        name: 'StakingGetReward'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'OnKick(address indexed urn, uint256 wad)'
+        name: 'StakingOnKick'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'AddFarm(address farm)'
+        name: 'StakingAddFarm'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'DelFarm(address farm)'
+        name: 'StakingDelFarm'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Lockstake Migrator ===
+  - name: LockstakeMigrator
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/LockstakeMigrator.json
+    events:
+      - event: 'Migrate(address oldOwner, uint256 oldIndex, address newOwner, uint256 newIndex, uint256 ink, uint256 debt)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Liquidations ===
+  - name: McdDog
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/McdDog.json
+    events:
+      - event: 'Bark(bytes32 indexed ilk, address indexed urn, uint256 ink, uint256 art, uint256 due, address clip, uint256 indexed id)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === PSM3 (multi-chain) ===
+  - name: Psm3
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/psm/Psm3.json
+    events:
+      - event: 'Swap(address indexed assetIn, address indexed assetOut, address sender, address indexed receiver, uint256 amountIn, uint256 amountOut, uint256 referralCode)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Curve Pool ===
+  - name: CurveUsdsStUsdsPool
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/curve/CurveStableSwapNG.json
+    events:
+      - event: 'TokenExchange(address indexed buyer, int128 sold_id, uint256 tokens_sold, int128 bought_id, uint256 tokens_bought)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+# === Network Configuration ===
+networks:
+  # Ethereum Mainnet (HyperSync)
+  - id: 1
+    start_block: 8122207
+    contracts:
+      - name: DSChief
+        address:
+          - 0x0a3f6849f78076aefadf113f5bed87720274ddc0
+      - name: DSChiefV2
+        address:
+          - 0x929d9A1435662357F54AdcF64DcEE4d6b867a6f9
+      - name: PollingEmitter
+        address:
+          - 0xf9be8f0945acddeedaa64dfca5fe9629d0cf8e5d
+      - name: PollingEmitterV2
+        address:
+          - 0xD3A9FE267852281a1e6307a1C37CDfD76d39b133
+      - name: DelegateFactory
+        address:
+          - 0xD897F108670903D1d6070fcf818f9db3615AF272
+      - name: DelegateFactoryV2
+        address:
+          - 0xC3D809E87A2C9da4F6d98fECea9135d834d6F5A0
+      - name: DelegateFactoryV3
+        address:
+          - 0x4Cf3DaeFA2683Cd18df00f7AFF5169C00a9EccD5
+      - name: VoteDelegate
+      - name: VoteDelegateV2
+      - name: VoteDelegateV3
+      - name: RewardsUsdsClePoints
+        address:
+          - 0x10ab606B067C9C461d8893c47C7512472E19e2Ce
+      - name: RewardsUsdsSky
+        address:
+          - 0x0650CAF159C5A49f711e8169D4336ECB9b950275
+      - name: RewardsUsdsSpk
+        address:
+          - 0x173e314C7635B45322cd8Cb14f44b312e079F3af
+      - name: RewardsLsmkrUsds
+        address:
+          - 0x92282235a39bE957fF1f37619fD22A9aE5507CB1
+      - name: RewardsLsskyUsds
+        address:
+          - 0x38E4254bD82ED5Ee97CD1C4278FAae748d998865
+      - name: RewardsLsskySpk
+        address:
+          - 0x99cBC0e4E6427F6939536eD24d1275B95ff77404
+      - name: RewardsLsskySky
+        address:
+          - 0xB44C2Fb4181D7Cb06bdFf34A46FdFe4a259B40Fc
+      - name: SavingsUsds
+        address:
+          - 0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD
+      - name: Stusds
+        address:
+          - 0x99CD4Ec3f88A45940936F469E4bB72A2A701EEB9
+      - name: DaiUsds
+        address:
+          - 0x3225737a9Bbb6473CB4a45b7244ACa2BeFdB276A
+      - name: MkrSky
+        address:
+          - 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B
+      - name: MkrSkyV2
+        address:
+          - 0xA1Ea1bA18E88C381C724a75F23a130420C403f9a
+      - name: LockstakeClipper
+        address:
+          - 0xA85621D35cAf9Cf5C146D2376Ce553D7B78A6239
+      - name: LockstakeMkr
+        address:
+          - 0xb4e0e45e142101dC3Ed768bac219fC35EDBED295
+      - name: LockstakeEngine
+        address:
+          - 0x2b16C07D5fD5cC701a0a871eae2aad6DA5fc8f12
+      - name: StakingEngine
+        address:
+          - 0xCe01C90dE7FD1bcFa39e237FE6D8D9F569e8A6a3
+      - name: LockstakeMigrator
+        address:
+          - 0x473d777f608C3C24B441AB6bD4bBcA6b7F9AF90B
+      - name: McdDog
+        address:
+          - 0x135954d155898D42C90D2a57824C690e0c7BEf1B
+      - name: CurveUsdsStUsdsPool
+        address:
+          - 0x2C7C98A3b1582D83c43987202aEFf638312478aE
+
+  # Tenderly Testnet (RPC fallback)
+  - id: 314310
+    rpc_config:
+      url: https://virtual.rpc.tenderly.co/jetstreamgg/jetstream/public/jetstream-testnet
+    start_block: 8122207
+    contracts:
+      - name: DSChief
+        address:
+          - 0x0a3f6849f78076aefadf113f5bed87720274ddc0
+      - name: DSChiefV2
+        address:
+          - 0x929d9A1435662357F54AdcF64DcEE4d6b867a6f9
+      - name: PollingEmitter
+        address:
+          - 0xf9be8f0945acddeedaa64dfca5fe9629d0cf8e5d
+      - name: PollingEmitterV2
+        address:
+          - 0xD3A9FE267852281a1e6307a1C37CDfD76d39b133
+      - name: DelegateFactory
+        address:
+          - 0xD897F108670903D1d6070fcf818f9db3615AF272
+      - name: DelegateFactoryV2
+        address:
+          - 0xC3D809E87A2C9da4F6d98fECea9135d834d6F5A0
+      - name: DelegateFactoryV3
+        address:
+          - 0x4Cf3DaeFA2683Cd18df00f7AFF5169C00a9EccD5
+      - name: VoteDelegate
+      - name: VoteDelegateV2
+      - name: VoteDelegateV3
+      - name: RewardsUsdsClePoints
+        address:
+          - 0x10ab606B067C9C461d8893c47C7512472E19e2Ce
+      - name: RewardsUsdsSky
+        address:
+          - 0x0650CAF159C5A49f711e8169D4336ECB9b950275
+      - name: RewardsUsdsSpk
+        address:
+          - 0x173e314C7635B45322cd8Cb14f44b312e079F3af
+      - name: RewardsLsmkrUsds
+        address:
+          - 0x92282235a39bE957fF1f37619fD22A9aE5507CB1
+      - name: RewardsLsskyUsds
+        address:
+          - 0x38E4254bD82ED5Ee97CD1C4278FAae748d998865
+      - name: RewardsLsskySpk
+        address:
+          - 0x99cBC0e4E6427F6939536eD24d1275B95ff77404
+      - name: RewardsLsskySky
+        address:
+          - 0xB44C2Fb4181D7Cb06bdFf34A46FdFe4a259B40Fc
+      - name: SavingsUsds
+        address:
+          - 0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD
+      - name: Stusds
+        address:
+          - 0x99CD4Ec3f88A45940936F469E4bB72A2A701EEB9
+      - name: DaiUsds
+        address:
+          - 0x3225737a9Bbb6473CB4a45b7244ACa2BeFdB276A
+      - name: MkrSky
+        address:
+          - 0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B
+      - name: MkrSkyV2
+        address:
+          - 0xA1Ea1bA18E88C381C724a75F23a130420C403f9a
+      - name: LockstakeClipper
+        address:
+          - 0x2e590d65dd357a7565efb5ffb329f8465f18c494
+      - name: LockstakeMkr
+        address:
+          - 0xb4e0e45e142101dC3Ed768bac219fC35EDBED295
+      - name: LockstakeEngine
+        address:
+          - 0x2b16C07D5fD5cC701a0a871eae2aad6DA5fc8f12
+      - name: StakingEngine
+        address:
+          - 0xCe01C90dE7FD1bcFa39e237FE6D8D9F569e8A6a3
+      - name: LockstakeMigrator
+        address:
+          - 0x473d777f608C3C24B441AB6bD4bBcA6b7F9AF90B
+      - name: McdDog
+        address:
+          - 0x135954d155898D42C90D2a57824C690e0c7BEf1B
+      - name: CurveUsdsStUsdsPool
+        address:
+          - 0x2C7C98A3b1582D83c43987202aEFf638312478aE
+
+  # Base (HyperSync)
+  - id: 8453
+    start_block: 21452622
+    contracts:
+      - name: Psm3
+        address:
+          - 0x1601843c5E9bC251A3272907010AFa41Fa18347E
+
+  # Optimism (HyperSync)
+  - id: 10
+    start_block: 135509927
+    contracts:
+      - name: Psm3
+        address:
+          - 0xe0F9978b907853F354d79188A3dEfbD41978af62
+
+  # Arbitrum (HyperSync)
+  - id: 42161
+    start_block: 24755861
+    contracts:
+      - name: Psm3
+        address:
+          - 0x2B05F8e1cACC6974fD79A673a341Fe1f58d27266
+      - name: PollingEmitterArbitrum
+        address:
+          - 0x4f4e551b4920a5417F8d4e7f8f099660dAdadcEC
+
+  # Unichain (HyperSync)
+  - id: 130
+    start_block: 16411311
+    contracts:
+      - name: Psm3
+        address:
+          - 0x7b42Ed932f26509465F7cE3FAF76FfCe1275312f

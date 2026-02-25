@@ -1,0 +1,13 @@
+export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+export const MKR_TOKEN = '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2';
+export const CHIEF_ADDRESS = '0x0a3f6849f78076aefadf113f5bed87720274ddc0';
+export const CHIEF_V2_ADDRESS = '0x929d9A1435662357F54AdcF64DcEE4d6b867a6f9';
+
+export const GOVERNANCE_TYPE = 'MakerGovernance';
+
+export const SpellState = {
+  ACTIVE: 'ACTIVE',
+  LIFTED: 'LIFTED',
+  SCHEDULED: 'SCHEDULED',
+  CAST: 'CAST',
+} as const;
