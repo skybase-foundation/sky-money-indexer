@@ -2,7 +2,7 @@ import { CurveUsdsStUsdsPool } from 'generated';
 import { readCurvePoolCoinEffect } from './helpers/contractCalls';
 
 CurveUsdsStUsdsPool.TokenExchange.handler(async ({ event, context }) => {
-  const entityId = `${event.transaction.hash}-${event.logIndex}`;
+  const entityId = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   // Kick off both contract calls in parallel at the top of the handler
   const [soldTokenAddress, boughtTokenAddress] = await Promise.all([
@@ -20,6 +20,7 @@ CurveUsdsStUsdsPool.TokenExchange.handler(async ({ event, context }) => {
 
   context.CurveTokenExchange.set({
     id: entityId,
+    chainId: event.chainId,
     buyer: event.params.buyer,
     soldId: event.params.sold_id,
     amountSold: event.params.tokens_sold,

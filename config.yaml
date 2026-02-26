@@ -1,5 +1,5 @@
-name: sky-indexer
-description: Sky Protocol Governance & DeFi Indexer
+name: sky-money-indexer
+description: Sky.money multichain on-chain indexer
 unordered_multichain_mode: true
 rollback_on_reorg: true
 preload_handlers: true

@@ -4,7 +4,8 @@ import {
   type PublicClient,
   type Address,
 } from 'viem';
-import { mainnet } from 'viem/chains';
+import { mainnet, base, optimism, arbitrum, unichain } from 'viem/chains';
+import type { Chain } from 'viem';
 import { createEffect, S } from 'envio';
 
 // ABI fragments for the contract calls we need
@@ -82,11 +83,29 @@ const RPC_URLS: Record<number, string> = {
   130: process.env.UNICHAIN_RPC_URL || '',
 };
 
+// Tenderly fork inherits mainnet config but with its own chain ID
+const tenderly: Chain = {
+  ...mainnet,
+  id: 314310,
+  name: 'Tenderly Testnet',
+};
+
+// Chain configs per chain ID
+const CHAINS: Record<number, Chain> = {
+  1: mainnet,
+  314310: tenderly,
+  8453: base,
+  10: optimism,
+  42161: arbitrum,
+  130: unichain,
+};
+
 // Pre-create public clients per chain at module level
 const clients: Record<number, PublicClient> = {};
 for (const [chainId, rpcUrl] of Object.entries(RPC_URLS)) {
-  clients[Number(chainId)] = createPublicClient({
-    chain: mainnet,
+  const id = Number(chainId);
+  clients[id] = createPublicClient({
+    chain: CHAINS[id] || mainnet,
     batch: { multicall: true },
     transport: http(rpcUrl, { batch: true }),
   });
@@ -184,14 +203,8 @@ export const readCurvePoolCoinEffect = createEffect(
         args: [input.index],
       });
       return (result as string).toLowerCase();
-    } catch (error) {
-      context.log.error('Failed to read Curve pool coin', {
-        poolAddress: input.poolAddress,
-        index: input.index.toString(),
-        chainId: input.chainId.toString(),
-        err: error,
-      });
-      throw error;
+    } catch {
+      return '0x0000000000000000000000000000000000000000';
     }
   },
 );

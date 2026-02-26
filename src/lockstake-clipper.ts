@@ -1,10 +1,11 @@
 import { LockstakeClipper } from 'generated';
 
 LockstakeClipper.Rely.handler(async ({ event, context }) => {
-  const id = `${event.transaction.hash}-${event.logIndex}`;
+  const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Rely.set({
     id,
+    chainId: event.chainId,
     usr: event.params.usr,
     blockNumber: BigInt(event.block.number),
     blockTimestamp: BigInt(event.block.timestamp),
@@ -13,10 +14,11 @@ LockstakeClipper.Rely.handler(async ({ event, context }) => {
 });
 
 LockstakeClipper.Deny.handler(async ({ event, context }) => {
-  const id = `${event.transaction.hash}-${event.logIndex}`;
+  const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Deny.set({
     id,
+    chainId: event.chainId,
     usr: event.params.usr,
     blockNumber: BigInt(event.block.number),
     blockTimestamp: BigInt(event.block.timestamp),
@@ -25,10 +27,11 @@ LockstakeClipper.Deny.handler(async ({ event, context }) => {
 });
 
 LockstakeClipper.FileUint.handler(async ({ event, context }) => {
-  const id = `${event.transaction.hash}-${event.logIndex}`;
+  const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.FileUint.set({
     id,
+    chainId: event.chainId,
     what: event.params.what,
     data: event.params.data,
     blockNumber: BigInt(event.block.number),
@@ -38,10 +41,11 @@ LockstakeClipper.FileUint.handler(async ({ event, context }) => {
 });
 
 LockstakeClipper.FileAddress.handler(async ({ event, context }) => {
-  const id = `${event.transaction.hash}-${event.logIndex}`;
+  const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.FileAddress.set({
     id,
+    chainId: event.chainId,
     what: event.params.what,
     data: event.params.data,
     blockNumber: BigInt(event.block.number),
@@ -51,10 +55,11 @@ LockstakeClipper.FileAddress.handler(async ({ event, context }) => {
 });
 
 LockstakeClipper.Kick.handler(async ({ event, context }) => {
-  const id = `${event.transaction.hash}-${event.logIndex}`;
+  const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Kick.set({
     id,
+    chainId: event.chainId,
     top: event.params.top,
     tab: event.params.tab,
     lot: event.params.lot,
@@ -68,10 +73,11 @@ LockstakeClipper.Kick.handler(async ({ event, context }) => {
 });
 
 LockstakeClipper.Take.handler(async ({ event, context }) => {
-  const id = `${event.transaction.hash}-${event.logIndex}`;
+  const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Take.set({
     id,
+    chainId: event.chainId,
     max: event.params.max,
     price: event.params.price,
     owe: event.params.owe,
@@ -85,10 +91,11 @@ LockstakeClipper.Take.handler(async ({ event, context }) => {
 });
 
 LockstakeClipper.Redo.handler(async ({ event, context }) => {
-  const id = `${event.transaction.hash}-${event.logIndex}`;
+  const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Redo.set({
     id,
+    chainId: event.chainId,
     top: event.params.top,
     tab: event.params.tab,
     lot: event.params.lot,
@@ -102,10 +109,11 @@ LockstakeClipper.Redo.handler(async ({ event, context }) => {
 });
 
 LockstakeClipper.Yank.handler(async ({ event, context }) => {
-  const id = `${event.transaction.hash}-${event.logIndex}`;
+  const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Yank.set({
     id,
+    chainId: event.chainId,
     blockNumber: BigInt(event.block.number),
     blockTimestamp: BigInt(event.block.timestamp),
     transactionHash: event.transaction.hash,

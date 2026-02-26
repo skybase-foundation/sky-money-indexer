@@ -1,10 +1,12 @@
 import { ZERO_ADDRESS } from './constants';
 
-export async function getStakingEngineUrn(urnAddress: string, context: any) {
-  let urn = await context.StakingUrn.get(urnAddress);
+export async function getStakingEngineUrn(urnAddress: string, chainId: number, context: any) {
+  const id = `${chainId}-${urnAddress.toLowerCase()}`;
+  let urn = await context.StakingUrn.get(id);
   if (!urn) {
     urn = {
-      id: urnAddress,
+      id,
+      chainId,
       owner: ZERO_ADDRESS,
       index: 0n,
       blockNumber: 0n,

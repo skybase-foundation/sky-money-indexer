@@ -9,11 +9,16 @@ DelegateFactoryV3.CreateVoteDelegate.handler(async ({ event, context }) => {
   const delegateOwnerAddress = event.params.delegate;
   const delegateContractAddress = event.params.voteDelegate;
 
+  const delegateId = `${event.chainId}-${delegateContractAddress.toLowerCase()}`;
+  const voterId = `${event.chainId}-${delegateContractAddress.toLowerCase()}`;
+  const adminId = `${event.chainId}-${delegateOwnerAddress.toLowerCase()}`;
+
   // Create the voter entity
-  let voter = await context.Voter.get(delegateContractAddress);
+  let voter = await context.Voter.get(voterId);
   if (!voter) {
     voter = {
-      id: delegateContractAddress,
+      id: voterId,
+      chainId: event.chainId,
       isVoteDelegate: false,
       isVoteProxy: false,
       mkrLockedInChiefRaw: 0n,
@@ -34,34 +39,34 @@ DelegateFactoryV3.CreateVoteDelegate.handler(async ({ event, context }) => {
     ...voter,
     isVoteDelegate: true,
     isVoteProxy: false,
-    delegateContract_id: delegateContractAddress,
+    delegateContract_id: delegateId,
   });
 
   // Create the delegate contract
-  let delegate = await context.Delegate.get(delegateContractAddress);
+  let delegate = await context.Delegate.get(delegateId);
   if (!delegate) {
     delegate = {
-      id: delegateContractAddress,
+      id: delegateId,
       ownerAddress: delegateOwnerAddress,
-      voter_id: voter.id,
-      delegations: [],
+      voter_id: voterId,
       delegators: 0,
       blockTimestamp: BigInt(event.block.timestamp),
       blockNumber: BigInt(event.block.number),
       txnHash: event.transaction.hash,
       totalDelegated: 0n,
-      delegationHistory: [],
       version: '3',
+      chainId: event.chainId,
     };
     context.Delegate.set(delegate);
   }
 
   // Create delegate admin entity
-  let delegateAdmin = await context.DelegateAdmin.get(delegateOwnerAddress);
+  let delegateAdmin = await context.DelegateAdmin.get(adminId);
   if (!delegateAdmin) {
     context.DelegateAdmin.set({
-      id: delegateOwnerAddress,
+      id: adminId,
       delegateContract_id: delegate.id,
+      chainId: event.chainId,
     });
   } else {
     context.DelegateAdmin.set({

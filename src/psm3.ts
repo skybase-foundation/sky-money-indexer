@@ -1,10 +1,11 @@
 import { Psm3 } from 'generated';
 
 Psm3.Swap.handler(async ({ event, context }) => {
-  const id = `${event.transaction.hash}-${event.logIndex}`;
+  const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Swap.set({
     id,
+    chainId: event.chainId,
     assetIn: event.params.assetIn,
     assetOut: event.params.assetOut,
     sender: event.params.sender,

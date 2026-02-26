@@ -1,10 +1,11 @@
 import { MkrSkyV2 } from 'generated';
 
 MkrSkyV2.MkrToSky.handler(async ({ event, context }) => {
-  const id = `${event.transaction.hash}-${event.logIndex}`;
+  const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.MkrToSkyUpgradeV2.set({
     id,
+    chainId: event.chainId,
     caller: event.params.caller,
     usr: event.params.usr,
     mkrAmt: event.params.mkrAmt,
@@ -16,10 +17,10 @@ MkrSkyV2.MkrToSky.handler(async ({ event, context }) => {
   });
 
   // Add to running total of mkrUpgraded
-  const mkrTotalId = 'mkrUpgraded';
+  const mkrTotalId = `${event.chainId}-mkrUpgraded`;
   let totalMkrUpgraded = await context.Total.get(mkrTotalId);
   if (!totalMkrUpgraded) {
-    totalMkrUpgraded = { id: mkrTotalId, total: 0n };
+    totalMkrUpgraded = { id: mkrTotalId, chainId: event.chainId, total: 0n };
   }
   context.Total.set({
     ...totalMkrUpgraded,
@@ -27,10 +28,10 @@ MkrSkyV2.MkrToSky.handler(async ({ event, context }) => {
   });
 
   // Add to running total of skyUpgraded
-  const skyTotalId = 'skyUpgraded';
+  const skyTotalId = `${event.chainId}-skyUpgraded`;
   let totalSkyUpgraded = await context.Total.get(skyTotalId);
   if (!totalSkyUpgraded) {
-    totalSkyUpgraded = { id: skyTotalId, total: 0n };
+    totalSkyUpgraded = { id: skyTotalId, chainId: event.chainId, total: 0n };
   }
   context.Total.set({
     ...totalSkyUpgraded,
@@ -38,10 +39,10 @@ MkrSkyV2.MkrToSky.handler(async ({ event, context }) => {
   });
 
   // Add to running total of skyUpgradeFees
-  const feeTotalId = 'skyUpgradeFees';
+  const feeTotalId = `${event.chainId}-skyUpgradeFees`;
   let totalSkyUpgradeFees = await context.Total.get(feeTotalId);
   if (!totalSkyUpgradeFees) {
-    totalSkyUpgradeFees = { id: feeTotalId, total: 0n };
+    totalSkyUpgradeFees = { id: feeTotalId, chainId: event.chainId, total: 0n };
   }
   context.Total.set({
     ...totalSkyUpgradeFees,

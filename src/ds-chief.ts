@@ -5,7 +5,7 @@ import {
   createExecutiveVotingPowerChange,
   createSlate,
   getVoter,
-  hexToNumberString,
+  hexToBigInt,
   removeWeightFromSpells,
   toDecimal,
 } from './helpers/helpers';
@@ -32,9 +32,9 @@ DSChief.LogNote.handler(async ({ event, context }) => {
 
 async function handleLock(event: any, context: any): Promise<void> {
   const sender = event.params.guy; // guy is the sender
-  const amount = hexToNumberString(event.params.foo); // foo is the amount being locked
+  const amount = hexToBigInt(event.params.foo); // foo is the amount being locked
 
-  const voter = await getVoter(sender, context);
+  const voter = await getVoter(sender, event.chainId, context);
 
   // Track the change of MKR locked in chief for the user
   const votingPowerChange = createExecutiveVotingPowerChange(
@@ -61,9 +61,9 @@ async function handleLock(event: any, context: any): Promise<void> {
 
 async function handleFree(event: any, context: any): Promise<void> {
   const sender = event.params.guy; // guy is the sender
-  const amount = hexToNumberString(event.params.foo); // foo is the amount being freed
+  const amount = hexToBigInt(event.params.foo); // foo is the amount being freed
 
-  const voter = await getVoter(sender, context);
+  const voter = await getVoter(sender, event.chainId, context);
 
   // Track the change of MKR locked in chief for the user
   const votingPowerChange = createExecutiveVotingPowerChange(
@@ -100,8 +100,8 @@ async function _handleSlateVote(
   event: any,
   context: any,
 ): Promise<void> {
-  const voter = await getVoter(sender, context);
-  let slate = await context.Slate.get(slateId);
+  const voter = await getVoter(sender, event.chainId, context);
+  let slate = await context.Slate.get(`${event.chainId}-${slateId}`);
   if (!slate) {
     slate = await createSlate(slateId, event, context);
   }
@@ -117,12 +117,13 @@ async function _handleSlateVote(
     const spellId = slate.yays[i];
     const spell = await context.Spell.get(spellId);
     if (spell) {
-      const voteId = `${spellId}-${sender}`;
+      const voteId = `${event.chainId}-${spellId}-${sender}`;
       context.ExecutiveVote.set({
         id: voteId,
+        chainId: event.chainId,
         weight: voter.mkrLockedInChiefRaw,
         reason: '',
-        voter_id: sender,
+        voter_id: voter.id,
         spell_id: spellId,
         block: BigInt(event.block.number),
         blockTime: BigInt(event.block.timestamp),
@@ -147,13 +148,9 @@ async function _handleSlateVote(
 }
 
 async function handleLift(event: any, context: any): Promise<void> {
-  // foo is the spellId in bytes, we trim and convert to address
-  // In the original: Address.fromString(event.params.foo.toHexString().slice(26))
-  // The foo param is a bytes32, with the address in the last 20 bytes
-  // In hex: 0x + 24 zeros + 40 hex chars of address = 66 chars total, slice(26) gives last 40 chars
-  const fooHex =
-    typeof event.params.foo === 'string' ? event.params.foo : event.params.foo;
-  const spellId = '0x' + fooHex.slice(26);
+  // foo is a bytes32 with the address in the last 20 bytes
+  // 0x + 24 zeros + 40 hex chars = 66 chars total, slice(26) gives last 40 chars
+  const spellId = `${event.chainId}-${'0x' + event.params.foo.slice(26)}`;
 
   const spell = await context.Spell.get(spellId);
   if (!spell) return;

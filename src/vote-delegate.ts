@@ -17,7 +17,7 @@ VoteDelegate.Lock.handler(async ({ event, context }) => {
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;
 
-  const delegate = await context.Delegate.get(delegateAddress);
+  const delegate = await context.Delegate.get(`${event.chainId}-${delegateAddress}`);
   if (!delegate) return;
 
   // Check if the delegator should be ignored (LSE or Staking Engine)
@@ -32,14 +32,11 @@ VoteDelegate.Lock.handler(async ({ event, context }) => {
   if (!delegation) {
     delegation = {
       id: delegationId,
+      chainId: event.chainId,
       delegator: sender,
       amount: 0n,
       timestamp: BigInt(event.block.timestamp),
       delegate_id: delegate.id,
-    };
-    updatedDelegate = {
-      ...updatedDelegate,
-      delegations: [...updatedDelegate.delegations, delegationId],
     };
   }
 
@@ -72,11 +69,11 @@ VoteDelegate.Lock.handler(async ({ event, context }) => {
     delegate_id: delegate.id,
     isLockstake: false,
     isStakingEngine: false,
+    chainId: event.chainId,
   });
 
   context.Delegate.set({
     ...updatedDelegate,
-    delegationHistory: [...updatedDelegate.delegationHistory, historyId],
     totalDelegated: updatedDelegate.totalDelegated + amount,
   });
 });
@@ -86,7 +83,7 @@ VoteDelegate.Free.handler(async ({ event, context }) => {
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;
 
-  const delegate = await context.Delegate.get(delegateAddress);
+  const delegate = await context.Delegate.get(`${event.chainId}-${delegateAddress}`);
   if (!delegate) return;
 
   // Check if the delegator should be ignored (LSE or Staking Engine)
@@ -101,14 +98,11 @@ VoteDelegate.Free.handler(async ({ event, context }) => {
   if (!delegation) {
     delegation = {
       id: delegationId,
+      chainId: event.chainId,
       delegator: sender,
       amount: 0n,
       timestamp: BigInt(event.block.timestamp),
       delegate_id: delegate.id,
-    };
-    updatedDelegate = {
-      ...updatedDelegate,
-      delegations: [...updatedDelegate.delegations, delegationId],
     };
   }
 
@@ -142,11 +136,11 @@ VoteDelegate.Free.handler(async ({ event, context }) => {
     delegate_id: delegate.id,
     isLockstake: false,
     isStakingEngine: false,
+    chainId: event.chainId,
   });
 
   context.Delegate.set({
     ...updatedDelegate,
-    delegationHistory: [...updatedDelegate.delegationHistory, historyId],
     totalDelegated: updatedDelegate.totalDelegated - amount,
   });
 });
