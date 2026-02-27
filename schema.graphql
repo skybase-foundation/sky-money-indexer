@@ -408,7 +408,7 @@ type Poll {
   id: String!
   chainId: Int! @index
   "Numeric poll ID (without chainId prefix)"
-  pollId: Int!
+  pollId: BigInt!
   "Poll creator"
   creator: String
   "Poll block created"
@@ -434,7 +434,7 @@ type ArbitrumPoll {
   id: String!
   chainId: Int! @index
   "Numeric poll ID (without chainId prefix)"
-  pollId: Int!
+  pollId: BigInt!
   "Poll creator"
   creator: String
   "Poll block created"

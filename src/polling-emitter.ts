@@ -8,7 +8,7 @@ import type {
 import { getVoter } from './helpers/helpers';
 
 // Helper: create a default Poll entity with all required fields
-function createDefaultPoll(pollId: string, chainId: number, pollIdNum: number) {
+function createDefaultPoll(pollId: string, chainId: number, pollIdNum: bigint) {
   return {
     id: pollId,
     chainId,
@@ -42,7 +42,7 @@ async function handlePollCreated(
     poll = createDefaultPoll(
       pollId,
       event.chainId,
-      Number(event.params.pollId),
+      event.params.pollId,
     );
   }
 
@@ -94,7 +94,7 @@ async function handlePollVote(
     poll = createDefaultPoll(
       pollId,
       event.chainId,
-      Number(event.params.pollId),
+      event.params.pollId,
     );
     context.Poll.set(poll);
   }
