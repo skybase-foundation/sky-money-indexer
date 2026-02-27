@@ -17,7 +17,9 @@ VoteDelegate.Lock.handler(async ({ event, context }) => {
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;
 
-  const delegate = await context.Delegate.get(`${event.chainId}-${delegateAddress}`);
+  const delegate = await context.Delegate.get(
+    `${event.chainId}-${delegateAddress}`,
+  );
   if (!delegate) return;
 
   // Check if the delegator should be ignored (LSE or Staking Engine)
@@ -83,7 +85,9 @@ VoteDelegate.Free.handler(async ({ event, context }) => {
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;
 
-  const delegate = await context.Delegate.get(`${event.chainId}-${delegateAddress}`);
+  const delegate = await context.Delegate.get(
+    `${event.chainId}-${delegateAddress}`,
+  );
   if (!delegate) return;
 
   // Check if the delegator should be ignored (LSE or Staking Engine)

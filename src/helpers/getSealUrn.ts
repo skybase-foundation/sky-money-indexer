@@ -1,6 +1,11 @@
+import type { handlerContext, SealUrn } from 'generated';
 import { ZERO_ADDRESS } from './constants';
 
-export async function getSealUrn(urnAddress: string, chainId: number, context: any) {
+export async function getSealUrn(
+  urnAddress: string,
+  chainId: number,
+  context: handlerContext,
+): Promise<SealUrn> {
   const id = `${chainId}-${urnAddress.toLowerCase()}`;
   let urn = await context.SealUrn.get(id);
   if (!urn) {

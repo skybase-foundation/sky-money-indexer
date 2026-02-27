@@ -1,10 +1,18 @@
 import { PollingEmitter, PollingEmitterV2 } from 'generated';
+import type {
+  handlerContext,
+  PollingEmitter_PollCreated_event,
+  PollingEmitter_PollWithdrawn_event,
+  PollingEmitter_Voted_event,
+} from 'generated';
 import { getVoter } from './helpers/helpers';
 
 // Helper: create a default Poll entity with all required fields
-function createDefaultPoll(pollId: string) {
+function createDefaultPoll(pollId: string, chainId: number, pollIdNum: number) {
   return {
     id: pollId,
+    chainId,
+    pollId: pollIdNum,
     blockCreated: undefined,
     blockWithdrawn: undefined,
     creator: undefined,
@@ -17,7 +25,10 @@ function createDefaultPoll(pollId: string) {
 }
 
 // Handler logic: PollCreated
-async function handlePollCreated(event: any, context: any) {
+async function handlePollCreated(
+  event: PollingEmitter_PollCreated_event,
+  context: handlerContext,
+) {
   const creator = event.params.creator;
   const blockCreated = event.params.blockCreated;
   const pollId = `${event.chainId}-${event.params.pollId.toString()}`;
@@ -28,14 +39,16 @@ async function handlePollCreated(event: any, context: any) {
   let poll = await context.Poll.get(pollId);
 
   if (!poll) {
-    poll = createDefaultPoll(pollId);
+    poll = createDefaultPoll(
+      pollId,
+      event.chainId,
+      Number(event.params.pollId),
+    );
   }
 
   // Always update poll properties, in case it was previously created with just an id in the vote handler
   context.Poll.set({
     ...poll,
-    chainId: event.chainId,
-    pollId: Number(event.params.pollId),
     creator: creator,
     blockCreated: blockCreated,
     startDate: startDate,
@@ -45,7 +58,10 @@ async function handlePollCreated(event: any, context: any) {
 }
 
 // Handler logic: PollWithdrawn
-async function handlePollWithdrawn(event: any, context: any) {
+async function handlePollWithdrawn(
+  event: PollingEmitter_PollWithdrawn_event,
+  context: handlerContext,
+) {
   const creator = event.params.creator;
   const blockWithdrawn = event.params.blockWithdrawn;
   const pollId = `${event.chainId}-${event.params.pollId.toString()}`;
@@ -62,7 +78,10 @@ async function handlePollWithdrawn(event: any, context: any) {
 }
 
 // Handler logic: Voted
-async function handlePollVote(event: any, context: any) {
+async function handlePollVote(
+  event: PollingEmitter_Voted_event,
+  context: handlerContext,
+) {
   const sender = event.params.voter;
   const pollId = `${event.chainId}-${event.params.pollId.toString()}`;
   const optionId = event.params.optionId;
@@ -72,8 +91,12 @@ async function handlePollVote(event: any, context: any) {
   let poll = await context.Poll.get(pollId);
   if (!poll) {
     // Poll won't exist if it was created on arbitrum
-    poll = createDefaultPoll(pollId);
-    context.Poll.set({ ...poll, chainId: event.chainId, pollId: Number(event.params.pollId) });
+    poll = createDefaultPoll(
+      pollId,
+      event.chainId,
+      Number(event.params.pollId),
+    );
+    context.Poll.set(poll);
   }
 
   const voteId = `${event.chainId}-${pollId}-${sender}-${event.block.number}`;

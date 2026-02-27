@@ -6,7 +6,9 @@ McdDog.Bark.handler(async ({ event, context }) => {
   // Attempt to load existing SealUrn
   const urnAddress = event.params.urn.toLowerCase();
   const sealUrn = await context.SealUrn.get(`${event.chainId}-${urnAddress}`);
-  const stakingUrn = await context.StakingUrn.get(`${event.chainId}-${urnAddress}`);
+  const stakingUrn = await context.StakingUrn.get(
+    `${event.chainId}-${urnAddress}`,
+  );
 
   context.Bark.set({
     id: barkId,

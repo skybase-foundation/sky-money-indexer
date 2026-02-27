@@ -1,4 +1,4 @@
-import { StakingEngine } from 'generated';
+import { Delegate, StakingEngine } from 'generated';
 import { getStakingEngineUrn } from './helpers/getStakingEngineUrn';
 import {
   getDelegate,
@@ -45,12 +45,16 @@ StakingEngine.StakingSelectVoteDelegate.handler(async ({ event, context }) => {
   let urn = await getStakingEngineUrn(urnAddress, event.chainId, context);
 
   const oldDelegateAddress = urn.voteDelegate_id;
-  let oldDelegate: any | null = null;
+  let oldDelegate: Delegate | null = null;
   if (oldDelegateAddress) {
     oldDelegate = await getDelegate(oldDelegateAddress, event.chainId, context);
   }
   const newDelegateAddress = event.params.voteDelegate;
-  let newDelegate = await getDelegate(newDelegateAddress, event.chainId, context);
+  let newDelegate = await getDelegate(
+    newDelegateAddress,
+    event.chainId,
+    context,
+  );
 
   // if voteDelegate address is zero address, urn is undelegating
   if (newDelegateAddress === ZERO_ADDRESS) {
@@ -201,7 +205,11 @@ StakingEngine.StakingLock.handler(async ({ event, context }) => {
   });
 
   if (urn.voteDelegate_id && amount > 0n) {
-    const delegate = await getDelegate(urn.voteDelegate_id, event.chainId, context);
+    const delegate = await getDelegate(
+      urn.voteDelegate_id,
+      event.chainId,
+      context,
+    );
     if (delegate) {
       await delegationLockHandler(
         delegate,
@@ -248,7 +256,11 @@ StakingEngine.StakingFree.handler(async ({ event, context }) => {
   });
 
   if (urn.voteDelegate_id && amount > 0n) {
-    const delegate = await getDelegate(urn.voteDelegate_id, event.chainId, context);
+    const delegate = await getDelegate(
+      urn.voteDelegate_id,
+      event.chainId,
+      context,
+    );
     if (delegate) {
       await delegationFreeHandler(
         delegate,
@@ -295,7 +307,11 @@ StakingEngine.StakingFreeNoFee.handler(async ({ event, context }) => {
   });
 
   if (urn.voteDelegate_id && amount > 0n) {
-    const delegate = await getDelegate(urn.voteDelegate_id, event.chainId, context);
+    const delegate = await getDelegate(
+      urn.voteDelegate_id,
+      event.chainId,
+      context,
+    );
     if (delegate) {
       await delegationFreeHandler(
         delegate,

@@ -1,4 +1,5 @@
 import { DSChief } from 'generated';
+import type { handlerContext, DSChief_LogNote_event } from 'generated';
 import { SpellState } from './helpers/constants';
 import {
   addWeightToSpells,
@@ -30,7 +31,10 @@ DSChief.LogNote.handler(async ({ event, context }) => {
   }
 });
 
-async function handleLock(event: any, context: any): Promise<void> {
+async function handleLock(
+  event: DSChief_LogNote_event,
+  context: handlerContext,
+): Promise<void> {
   const sender = event.params.guy; // guy is the sender
   const amount = hexToBigInt(event.params.foo); // foo is the amount being locked
 
@@ -59,7 +63,10 @@ async function handleLock(event: any, context: any): Promise<void> {
   await addWeightToSpells(voter.currentSpells, amount, context);
 }
 
-async function handleFree(event: any, context: any): Promise<void> {
+async function handleFree(
+  event: DSChief_LogNote_event,
+  context: handlerContext,
+): Promise<void> {
   const sender = event.params.guy; // guy is the sender
   const amount = hexToBigInt(event.params.foo); // foo is the amount being freed
 
@@ -88,7 +95,10 @@ async function handleFree(event: any, context: any): Promise<void> {
   await removeWeightFromSpells(voter.currentSpells, amount, context);
 }
 
-async function handleVote(event: any, context: any): Promise<void> {
+async function handleVote(
+  event: DSChief_LogNote_event,
+  context: handlerContext,
+): Promise<void> {
   const sender = event.params.guy; // guy is the sender
   const slateId = event.params.foo; // foo is slate id
   await _handleSlateVote(sender, slateId, event, context);
@@ -97,8 +107,8 @@ async function handleVote(event: any, context: any): Promise<void> {
 async function _handleSlateVote(
   sender: string,
   slateId: string,
-  event: any,
-  context: any,
+  event: DSChief_LogNote_event,
+  context: handlerContext,
 ): Promise<void> {
   const voter = await getVoter(sender, event.chainId, context);
   let slate = await context.Slate.get(`${event.chainId}-${slateId}`);
@@ -147,7 +157,10 @@ async function _handleSlateVote(
   });
 }
 
-async function handleLift(event: any, context: any): Promise<void> {
+async function handleLift(
+  event: DSChief_LogNote_event,
+  context: handlerContext,
+): Promise<void> {
   // foo is a bytes32 with the address in the last 20 bytes
   // 0x + 24 zeros + 40 hex chars = 66 chars total, slice(26) gives last 40 chars
   const spellId = `${event.chainId}-${'0x' + event.params.foo.slice(26)}`;

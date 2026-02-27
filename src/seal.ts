@@ -1,4 +1,4 @@
-import { LockstakeEngine } from 'generated';
+import { LockstakeEngine, Delegate } from 'generated';
 import { getSealUrn } from './helpers/getSealUrn';
 import {
   getDelegate,
@@ -54,12 +54,16 @@ LockstakeEngine.SealSelectVoteDelegate.handler(async ({ event, context }) => {
   let urn = await getSealUrn(urnAddress, event.chainId, context);
 
   const oldDelegateAddress = urn.voteDelegate_id;
-  let oldDelegate: any | null = null;
+  let oldDelegate: Delegate | null = null;
   if (oldDelegateAddress) {
     oldDelegate = await getDelegate(oldDelegateAddress, event.chainId, context);
   }
   const newDelegateAddress = event.params.voteDelegate;
-  let newDelegate = await getDelegate(newDelegateAddress, event.chainId, context);
+  let newDelegate = await getDelegate(
+    newDelegateAddress,
+    event.chainId,
+    context,
+  );
 
   // if voteDelegate address is zero address, urn is undelegating
   if (newDelegateAddress === ZERO_ADDRESS) {
@@ -226,7 +230,11 @@ LockstakeEngine.SealLock.handler(async ({ event, context }) => {
   });
 
   if (urn.voteDelegate_id && amount > 0n) {
-    const delegate = await getDelegate(urn.voteDelegate_id, event.chainId, context);
+    const delegate = await getDelegate(
+      urn.voteDelegate_id,
+      event.chainId,
+      context,
+    );
     if (delegate) {
       await delegationLockHandler(
         delegate,
@@ -289,7 +297,11 @@ LockstakeEngine.LockSky.handler(async ({ event, context }) => {
   });
 
   if (urn.voteDelegate_id && amount > 0n) {
-    const delegate = await getDelegate(urn.voteDelegate_id, event.chainId, context);
+    const delegate = await getDelegate(
+      urn.voteDelegate_id,
+      event.chainId,
+      context,
+    );
     if (delegate) {
       await delegationLockHandler(
         delegate,
@@ -337,7 +349,11 @@ LockstakeEngine.SealFree.handler(async ({ event, context }) => {
   });
 
   if (urn.voteDelegate_id && amount > 0n) {
-    const delegate = await getDelegate(urn.voteDelegate_id, event.chainId, context);
+    const delegate = await getDelegate(
+      urn.voteDelegate_id,
+      event.chainId,
+      context,
+    );
     if (delegate) {
       await delegationFreeHandler(
         delegate,
@@ -399,7 +415,11 @@ LockstakeEngine.FreeSky.handler(async ({ event, context }) => {
   });
 
   if (urn.voteDelegate_id && amount > 0n) {
-    const delegate = await getDelegate(urn.voteDelegate_id, event.chainId, context);
+    const delegate = await getDelegate(
+      urn.voteDelegate_id,
+      event.chainId,
+      context,
+    );
     if (delegate) {
       await delegationFreeHandler(
         delegate,
@@ -446,7 +466,11 @@ LockstakeEngine.SealFreeNoFee.handler(async ({ event, context }) => {
   });
 
   if (urn.voteDelegate_id && amount > 0n) {
-    const delegate = await getDelegate(urn.voteDelegate_id, event.chainId, context);
+    const delegate = await getDelegate(
+      urn.voteDelegate_id,
+      event.chainId,
+      context,
+    );
     if (delegate) {
       await delegationFreeHandler(
         delegate,

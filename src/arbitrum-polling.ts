@@ -1,7 +1,12 @@
 import { PollingEmitterArbitrum } from 'generated';
+import type { handlerContext, ArbitrumVoter } from 'generated';
 
 // Helper: get or create an ArbitrumVoter entity
-async function getArbitrumVoter(address: string, chainId: number, context: any) {
+async function getArbitrumVoter(
+  address: string,
+  chainId: number,
+  context: handlerContext,
+): Promise<ArbitrumVoter> {
   const id = `${chainId}-${address}`;
   let voter = await context.ArbitrumVoter.get(id);
   if (!voter) {
