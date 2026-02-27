@@ -20,6 +20,7 @@ async function getReward(
     reward = {
       id: rewardId,
       chainId: chainId,
+      address: rewardAddress.toLowerCase(),
       totalSupplied: 0n,
       totalRewardsClaimed: 0n,
       lockstakeActive: false,
