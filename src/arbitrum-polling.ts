@@ -8,6 +8,7 @@ async function getArbitrumVoter(address: string, chainId: number, context: any) 
     voter = {
       id,
       chainId: chainId,
+      address: address.toLowerCase(),
       numberPollVotes: 0,
       lastVotedTimestamp: 0n,
     };
@@ -43,6 +44,7 @@ PollingEmitterArbitrum.Voted.handler(async ({ event, context }) => {
     poll = {
       id: pollId,
       chainId: event.chainId,
+      pollId: Number(event.params.pollId),
       blockCreated: undefined,
       blockWithdrawn: undefined,
       creator: undefined,
@@ -85,6 +87,7 @@ PollingEmitterArbitrum.PollCreated.handler(async ({ event, context }) => {
     poll = {
       id: pollId,
       chainId: event.chainId,
+      pollId: Number(event.params.pollId),
       blockCreated: undefined,
       blockWithdrawn: undefined,
       creator: undefined,
@@ -99,6 +102,7 @@ PollingEmitterArbitrum.PollCreated.handler(async ({ event, context }) => {
   // Always update poll properties, in case it was previously created with just an id in the vote handler
   context.ArbitrumPoll.set({
     ...poll,
+    pollId: Number(event.params.pollId),
     creator: creator,
     blockCreated: blockCreated,
     startDate: startDate,

@@ -7,6 +7,7 @@ export async function getStakingEngineUrn(urnAddress: string, chainId: number, c
     urn = {
       id,
       chainId,
+      address: urnAddress.toLowerCase(),
       owner: ZERO_ADDRESS,
       index: 0n,
       blockNumber: 0n,

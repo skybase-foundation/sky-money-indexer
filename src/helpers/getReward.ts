@@ -5,6 +5,7 @@ export async function getReward(rewardAddress: string, chainId: number, context:
     reward = {
       id,
       chainId,
+      address: rewardAddress.toLowerCase(),
       totalSupplied: 0n,
       totalRewardsClaimed: 0n,
       lockstakeActive: false,

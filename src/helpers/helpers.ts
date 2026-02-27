@@ -22,6 +22,7 @@ export async function getVoter(address: string, chainId: number, context: any) {
     voter = {
       id,
       chainId,
+      address: address.toLowerCase(),
       isVoteDelegate: false,
       isVoteProxy: undefined,
       delegateContract_id: undefined,
@@ -206,6 +207,7 @@ export async function createSlateV2(
           spell = {
             id: spellId,
             chainId,
+            address: spellAddress_,
             description,
             state: SpellState.ACTIVE,
             creationBlock: BigInt(event.block.number),

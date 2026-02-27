@@ -21,6 +21,7 @@ DelegateFactory.CreateVoteDelegate.handler(async ({ event, context }) => {
     voter = {
       id: voterId,
       chainId: event.chainId,
+      address: delegateContractAddress.toLowerCase(),
       isVoteDelegate: false,
       isVoteProxy: false,
       mkrLockedInChiefRaw: 0n,
@@ -39,6 +40,7 @@ DelegateFactory.CreateVoteDelegate.handler(async ({ event, context }) => {
   }
   context.Voter.set({
     ...voter,
+    address: delegateContractAddress.toLowerCase(),
     isVoteDelegate: true,
     isVoteProxy: false,
     delegateContract_id: delegateId,
@@ -49,6 +51,7 @@ DelegateFactory.CreateVoteDelegate.handler(async ({ event, context }) => {
   if (!delegateInfo) {
     delegateInfo = {
       id: delegateId,
+      address: delegateContractAddress.toLowerCase(),
       ownerAddress: delegateOwnerAddress,
       voter_id: voterId,
       delegators: 0,

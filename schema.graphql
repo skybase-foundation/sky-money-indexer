@@ -78,6 +78,8 @@ type SpellV2 {
   "Spell's contract address"
   id: ID!
   chainId: Int! @index
+  "Spell contract address (without chainId prefix)"
+  address: String!
   "Spell description"
   description: String!
   "State of the spell"
@@ -138,6 +140,8 @@ type Delegate {
   "A delegate is a contract owned by an address, Id is the address of the delegate contract"
   id: String!
   chainId: Int! @index
+  "Delegate contract address (without chainId prefix)"
+  address: String!
   "Voter entity of the delegate"
   voter: Voter!
   "Address of the delegate owner"
@@ -174,6 +178,8 @@ type Voter {
   "A Voter is any address that has participated in governance, a proxy contract or a delegate contract"
   id: String!
   chainId: Int! @index
+  "Voter address (without chainId prefix)"
+  address: String!
   "Is a vote delegate contract"
   isVoteDelegate: Boolean
   "Is a vote proxy contract"
@@ -220,6 +226,8 @@ type ArbitrumVoter {
   "A Voter is any address that has participated in governance on Arbitrum"
   id: String!
   chainId: Int! @index
+  "Voter address (without chainId prefix)"
+  address: String!
   "Last time voted"
   lastVotedTimestamp: BigInt!
   "Number of polls voted on"
@@ -399,6 +407,8 @@ type Poll {
   "Poll id"
   id: String!
   chainId: Int! @index
+  "Numeric poll ID (without chainId prefix)"
+  pollId: Int!
   "Poll creator"
   creator: String
   "Poll block created"
@@ -423,6 +433,8 @@ type ArbitrumPoll {
   "Poll id"
   id: String!
   chainId: Int! @index
+  "Numeric poll ID (without chainId prefix)"
+  pollId: Int!
   "Poll creator"
   creator: String
   "Poll block created"
@@ -446,6 +458,8 @@ type ArbitrumPoll {
 type Reward {
   id: ID!
   chainId: Int! @index
+  "Reward contract address (without chainId prefix)"
+  address: String!
   totalSupplied: BigInt!
   totalRewardsClaimed: BigInt!
   lockstakeActive: Boolean!
@@ -961,6 +975,8 @@ type SealOnRemove {
 type SealUrn {
   id: ID!
   chainId: Int! @index
+  "Urn address (without chainId prefix)"
+  address: String!
   owner: String! @index
   index: BigInt!
   blockNumber: BigInt!
@@ -1121,6 +1137,8 @@ type StakingOnKick {
 type StakingUrn {
   id: ID!
   chainId: Int! @index
+  "Urn address (without chainId prefix)"
+  address: String!
   owner: String! @index
   index: BigInt!
   blockNumber: BigInt!
