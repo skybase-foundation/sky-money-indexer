@@ -45,7 +45,7 @@ async function getRewardSupplier(
   userId: string,
   context: handlerContext,
 ) {
-  const rewardSupplierId = `${chainId}-${rewardId}-${userId}`;
+  const rewardSupplierId = `${rewardId}-${userId}`;
   let supplier = await context.RewardSupplier.get(rewardSupplierId);
   if (!supplier) {
     supplier = {

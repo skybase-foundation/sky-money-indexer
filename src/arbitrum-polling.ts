@@ -29,7 +29,7 @@ PollingEmitterArbitrum.Voted.handler(async ({ event, context }) => {
 
   const voter = await getArbitrumVoter(sender, event.chainId, context);
 
-  const voteId = `${event.chainId}-${pollId}-${sender}-${event.block.number}`;
+  const voteId = `${pollId}-${sender}-${event.block.number}`;
 
   let pollVote = await context.ArbitrumPollVote.get(voteId);
   let updatedVoter = {

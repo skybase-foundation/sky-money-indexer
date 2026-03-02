@@ -95,7 +95,7 @@ async function _handleSlateVote(
     const spellId = slate.yays[i];
     const spell = await context.SpellV2.get(spellId);
     if (spell) {
-      const voteId = `${event.chainId}-${spellId}-${sender}`;
+      const voteId = `${spellId}-${sender}`;
       context.ExecutiveVoteV2.set({
         id: voteId,
         chainId: event.chainId,

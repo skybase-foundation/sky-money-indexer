@@ -99,7 +99,7 @@ async function handlePollVote(
     context.Poll.set(poll);
   }
 
-  const voteId = `${event.chainId}-${pollId}-${sender}-${event.block.number}`;
+  const voteId = `${pollId}-${sender}-${event.block.number}`;
 
   let pollVote = await context.PollVote.get(voteId);
   let updatedVoter = {

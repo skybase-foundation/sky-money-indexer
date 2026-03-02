@@ -600,16 +600,6 @@ contracts:
           transaction_fields:
             - hash
 
-  # === Lockstake Migrator ===
-  - name: LockstakeMigrator
-    handler: src/EventHandlers.ts
-    abi_file_path: abis/maker/LockstakeMigrator.json
-    events:
-      - event: 'Migrate(address oldOwner, uint256 oldIndex, address newOwner, uint256 newIndex, uint256 ink, uint256 debt)'
-        field_selection:
-          transaction_fields:
-            - hash
-
   # === Liquidations ===
   - name: McdDog
     handler: src/EventHandlers.ts
@@ -718,9 +708,6 @@ networks:
       - name: StakingEngine
         address:
           - 0xCe01C90dE7FD1bcFa39e237FE6D8D9F569e8A6a3
-      - name: LockstakeMigrator
-        address:
-          - 0x473d777f608C3C24B441AB6bD4bBcA6b7F9AF90B
       - name: McdDog
         address:
           - 0x135954d155898D42C90D2a57824C690e0c7BEf1B
@@ -806,9 +793,6 @@ networks:
       - name: StakingEngine
         address:
           - 0xCe01C90dE7FD1bcFa39e237FE6D8D9F569e8A6a3
-      - name: LockstakeMigrator
-        address:
-          - 0x473d777f608C3C24B441AB6bD4bBcA6b7F9AF90B
       - name: McdDog
         address:
           - 0x135954d155898D42C90D2a57824C690e0c7BEf1B

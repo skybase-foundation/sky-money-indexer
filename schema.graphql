@@ -1004,20 +1004,6 @@ type SealUrn {
   barks: [Bark!]! @derivedFrom(field: "sealUrn")
 }
 
-type LockstakeMigrate {
-  id: ID!
-  chainId: Int! @index
-  oldOwner: String!
-  oldIndex: BigInt!
-  newOwner: String!
-  newIndex: BigInt!
-  ink: BigInt!
-  debt: BigInt!
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: String!
-}
-
 type StakingOpen {
   id: ID!
   chainId: Int! @index

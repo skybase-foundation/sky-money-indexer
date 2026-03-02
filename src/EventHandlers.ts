@@ -38,8 +38,6 @@ import './vote-delegate-v3';
 import './seal';
 import './lockstake-clipper';
 import './lockstake-mkr';
-import './lockstake-migrator';
-
 // === Staking Engine ===
 import './staking-engine';
 
