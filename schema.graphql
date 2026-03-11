@@ -1,18 +1,3 @@
-type Slate {
-  "Unique Slate ID, produced by hashing the addresses in the slate"
-  id: ID!
-  chainId: Int! @index
-  "Transaction hash of the Slate creation"
-  txnHash: String!
-  "Block number slate was created "
-  creationBlock: BigInt!
-  "Timestamp of block slate was created in"
-  creationTime: BigInt!
-
-  "Spells that are on this slate (stored as spell IDs)"
-  yays: [String!]!
-}
-
 type SlateV2 {
   "Unique Slate ID, produced by hashing the addresses in the slate"
   id: ID!
@@ -26,51 +11,6 @@ type SlateV2 {
 
   "Spells that are on this slate (stored as spell IDs)"
   yays: [String!]!
-}
-
-# Also referred to as Executive Proposal
-type Spell {
-  "Spell's contract address"
-  id: ID!
-  chainId: Int! @index
-  "Spell description"
-  description: String!
-  "State of the spell"
-  state: SpellState!
-  "Block number spell was created in"
-  creationBlock: BigInt!
-  "Timestamp of block spell was created in"
-  creationTime: BigInt!
-  "Timestamp of spell expiry"
-  expiryTime: BigInt!
-  "Transaction hash of Spell lift"
-  liftedTxnHash: String
-  "Block number spell was lifted in"
-  liftedBlock: BigInt
-  "Timestamp of Spell lift"
-  liftedTime: BigInt
-  "Voting power when lifted"
-  liftedWith: BigInt
-  "Transaction hash of Spell scheduled"
-  scheduledTxnHash: String
-  "Block number spell was scheduled in"
-  scheduledBlock: BigInt
-  "Timestamp of Spell scheduled"
-  scheduledTime: BigInt
-  "Transaction hash of Spell cast"
-  castTxnHash: String
-  "Block number spell was cast in"
-  castBlock: BigInt
-  "Timestamp of Spell cast"
-  castTime: BigInt
-  "Voting power when cast"
-  castWith: BigInt
-  "Number of votes for the Spell"
-  totalVotes: BigInt!
-  "Weighted voting power for the Spell"
-  totalWeightedVotes: BigInt!
-  "Votes associated to this spell"
-  votes: [ExecutiveVote!]! @derivedFrom(field: "spell")
 }
 
 # Also referred to as Executive Proposal
@@ -189,34 +129,21 @@ type Voter {
   "Proxy contract"
   proxyContract: VoteProxy
   "Voter voting power expressed in the smallest unit of the token"
-  mkrLockedInChiefRaw: BigInt!
-  "Voter voting power expressed as a BigDecimal normalized value"
-  mkrLockedInChief: BigDecimal!
-  "Voter voting power expressed in the smallest unit of the token"
   skyLockedInChiefRaw: BigInt!
   "Voter voting power expressed as a BigDecimal normalized value"
   skyLockedInChief: BigDecimal!
-  "Current slate of spells voter is voting for on the v1 chief (stored as spell IDs)"
-  currentSpells: [String!]!
   "Current slate of spells voter is voting for on the v2 chief (stored as spell IDs)"
   currentSpellsV2: [String!]!
-  "Number of spells voted on"
-  numberExecutiveVotes: Int!
   "Number of spells voted on for the v2 chief"
   numberExecutiveVotesV2: Int!
   "Number of polls voted on"
   numberPollVotes: Int!
   "Last time voted"
   lastVotedTimestamp: BigInt!
-  "Votes that a voter has made in different spells for the v1 chief"
-  executiveVotes: [ExecutiveVote!]! @derivedFrom(field: "voter")
   "Votes that a voter has made in different spells for the v2 chief"
   executiveVotesV2: [ExecutiveVoteV2!]! @derivedFrom(field: "voter")
   "Poll votes associated to this voter"
   pollVotes: [PollVote!]! @derivedFrom(field: "voter")
-  "Voting power changes for this voter"
-  votingPowerChanges: [ExecutiveVotingPowerChange!]!
-    @derivedFrom(field: "voter")
   "V2 voting power changes for this voter"
   v2VotingPowerChanges: [ExecutiveVotingPowerChangeV2!]!
     @derivedFrom(field: "voter")
@@ -274,30 +201,6 @@ type DelegationHistory {
   isStakingEngine: Boolean!
 }
 
-type ExecutiveVotingPowerChange {
-  "Unique entity used to keep track of voting power delta"
-  id: ID!
-  chainId: Int! @index
-  "Token addresss"
-  tokenAddress: String
-  "Token address for voter"
-  voter: Voter!
-  "Sender of the voting power change transaction"
-  previousBalance: BigInt!
-  "New voting power of delegate"
-  newBalance: BigInt!
-  "amount can be negative or positive"
-  amount: BigInt!
-  "Block time change happened"
-  blockTimestamp: BigInt!
-  "Transaction hash of the voting power change"
-  txnHash: String!
-  "Log index for delegate voting power change"
-  logIndex: BigInt!
-  "Block number of event"
-  blockNumber: BigInt!
-}
-
 type ExecutiveVotingPowerChangeV2 {
   "Unique entity used to keep track of voting power delta"
   id: ID!
@@ -320,28 +223,6 @@ type ExecutiveVotingPowerChangeV2 {
   logIndex: BigInt!
   "Block number of event"
   blockNumber: BigInt!
-}
-
-type ExecutiveVote {
-  "Spell ID + Voter ID"
-  id: ID!
-  chainId: Int! @index
-  "Voting weight expressed in the vote"
-  weight: BigInt!
-  "Reason for voting choice"
-  reason: String
-  "Voter that emitted the vote"
-  voter: Voter!
-  "spell that is being voted on"
-  spell: Spell!
-  "Block number vote is cast in"
-  block: BigInt!
-  "Timestamp of block vote was cast in"
-  blockTime: BigInt!
-  "Transaction hash of the vote"
-  txnHash: String!
-  "Log index for event"
-  logIndex: BigInt!
 }
 
 type ExecutiveVoteV2 {

@@ -6,16 +6,6 @@ preload_handlers: true
 address_format: lowercase
 schema: schema.graphql
 contracts:
-  # === Governance: DSChief (V1) ===
-  - name: DSChief
-    handler: src/EventHandlers.ts
-    abi_file_path: abis/maker/DSChief.json
-    events:
-      - event: 'LogNote(bytes4 sig, address guy, bytes32 foo, bytes32 bar, uint256 wad, bytes fax)'
-        field_selection:
-          transaction_fields:
-            - hash
-
   # === Governance: DSChief (V2) ===
   - name: DSChiefV2
     handler: src/EventHandlers.ts
@@ -637,9 +627,6 @@ networks:
   - id: 1
     start_block: 8122207
     contracts:
-      - name: DSChief
-        address:
-          - 0x0a3f6849f78076aefadf113f5bed87720274ddc0
       - name: DSChiefV2
         address:
           - 0x929d9A1435662357F54AdcF64DcEE4d6b867a6f9
@@ -722,9 +709,6 @@ networks:
       url: https://virtual.rpc.tenderly.co/jetstreamgg/jetstream/public/jetstream-testnet
     start_block: 8122207
     contracts:
-      - name: DSChief
-        address:
-          - 0x0a3f6849f78076aefadf113f5bed87720274ddc0
       - name: DSChiefV2
         address:
           - 0x929d9A1435662357F54AdcF64DcEE4d6b867a6f9

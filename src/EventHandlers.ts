@@ -44,8 +44,7 @@ import './staking-engine';
 // === Liquidations ===
 import './mcd-dog';
 
-// === Governance (DSChief LogNote is anonymous - may not work with HyperSync) ===
-import './ds-chief';
+// === Governance ===
 import './ds-chief-v2';
 import './polling-emitter';
 import './arbitrum-polling';
