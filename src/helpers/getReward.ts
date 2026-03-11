@@ -5,13 +5,13 @@ export async function getReward(
   chainId: number,
   context: handlerContext,
 ): Promise<Reward> {
-  const id = `${chainId}-${rewardAddress.toLowerCase()}`;
+  const id = `${chainId}-${rewardAddress}`;
   let reward = await context.Reward.get(id);
   if (!reward) {
     reward = {
       id,
       chainId,
-      address: rewardAddress.toLowerCase(),
+      address: rewardAddress,
       totalSupplied: 0n,
       totalRewardsClaimed: 0n,
       lockstakeActive: false,

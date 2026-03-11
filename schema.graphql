@@ -141,7 +141,7 @@ type Delegate {
   id: String!
   chainId: Int! @index
   "Delegate contract address (without chainId prefix)"
-  address: String!
+  address: String! @index
   "Voter entity of the delegate"
   voter: Voter!
   "Address of the delegate owner"
@@ -179,7 +179,7 @@ type Voter {
   id: String!
   chainId: Int! @index
   "Voter address (without chainId prefix)"
-  address: String!
+  address: String! @index
   "Is a vote delegate contract"
   isVoteDelegate: Boolean
   "Is a vote proxy contract"
@@ -227,7 +227,7 @@ type ArbitrumVoter {
   id: String!
   chainId: Int! @index
   "Voter address (without chainId prefix)"
-  address: String!
+  address: String! @index
   "Last time voted"
   lastVotedTimestamp: BigInt!
   "Number of polls voted on"

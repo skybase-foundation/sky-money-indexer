@@ -46,8 +46,8 @@ ContractName.EventName.handler(async ({ event, context }) => {
 });
 ```
 
-### Address normalization
-All addresses stored as lowercase strings. Use `.toLowerCase()` when comparing.
+### Address casing
+Envio guarantees consistent address casing per chain, so **do not** call `.toLowerCase()` on event-sourced addresses. The only exception is when comparing against hardcoded address constants (e.g. LSE/Staking Engine filter lists), where `.toLowerCase()` is needed on both sides.
 
 ## Multichain
 

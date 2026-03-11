@@ -3,29 +3,7 @@ import type {
   delegation as Delegation,
   handlerContext,
 } from 'generated';
-
-function getLseAddresses(): string[] {
-  return [
-    '0x2b16C07D5fD5cC701a0a871eae2aad6DA5fc8f12', // Tenderly LSE address
-    '0x2b16C07D5fD5cC701a0a871eae2aad6DA5fc8f12', // Mainnet LSE address
-  ];
-}
-
-function getStakingEngineAddresses(): string[] {
-  return [
-    '0xCe01C90dE7FD1bcFa39e237FE6D8D9F569e8A6a3', // Tenderly Staking Engine address
-    '0xCe01C90dE7FD1bcFa39e237FE6D8D9F569e8A6a3', // Mainnet Staking Engine address
-  ];
-}
-
-function isAddressInList(address: string, addresses: string[]): boolean {
-  for (let i = 0; i < addresses.length; i++) {
-    if (addresses[i].toLowerCase() === address.toLowerCase()) {
-      return true;
-    }
-  }
-  return false;
-}
+import { shouldIgnoreDelegator } from '../constants';
 
 export async function delegationLockHandler(
   delegate: Delegate,
@@ -43,16 +21,7 @@ export async function delegationLockHandler(
   const { delegation, updatedDelegate: delegateWithDelegation } =
     await getDelegation(delegate, address, blockTimestamp, chainId, context);
 
-  const lseAddresses = getLseAddresses();
-  const stakingEngineAddresses = getStakingEngineAddresses();
-
-  // Check if the delegator matches any of the LSE or Staking Engine addresses
-  const delegatorAddress = delegation.delegator.toLowerCase();
-  const shouldIgnore =
-    isAddressInList(delegatorAddress, lseAddresses) ||
-    isAddressInList(delegatorAddress, stakingEngineAddresses);
-
-  if (shouldIgnore) {
+  if (shouldIgnoreDelegator(delegation.delegator)) {
     return;
   }
 
@@ -116,16 +85,7 @@ export async function delegationFreeHandler(
   const { delegation, updatedDelegate: delegateWithDelegation } =
     await getDelegation(delegate, address, blockTimestamp, chainId, context);
 
-  const lseAddresses = getLseAddresses();
-  const stakingEngineAddresses = getStakingEngineAddresses();
-
-  // Check if the delegator matches any of the LSE or Staking Engine addresses
-  const delegatorAddress = delegation.delegator.toLowerCase();
-  const shouldIgnore =
-    isAddressInList(delegatorAddress, lseAddresses) ||
-    isAddressInList(delegatorAddress, stakingEngineAddresses);
-
-  if (shouldIgnore) {
+  if (shouldIgnoreDelegator(delegation.delegator)) {
     return;
   }
 
@@ -207,7 +167,7 @@ export async function getDelegate(
     return null;
   }
   const delegate = await context.Delegate.get(
-    `${chainId}-${delegateAddress.toLowerCase()}`,
+    `${chainId}-${delegateAddress}`,
   );
   if (!delegate) {
     return null;

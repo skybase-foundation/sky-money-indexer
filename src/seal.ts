@@ -87,7 +87,7 @@ LockstakeEngine.SealSelectVoteDelegate.handler(async ({ event, context }) => {
     if (oldDelegate && urn.mkrLocked > 0n) {
       await delegationFreeHandler(
         oldDelegate,
-        urn.owner,
+        event.params.owner,
         urn.mkrLocked,
         BigInt(event.block.timestamp),
         BigInt(event.block.number),
@@ -123,7 +123,7 @@ LockstakeEngine.SealSelectVoteDelegate.handler(async ({ event, context }) => {
       if (oldDelegate && urn.mkrLocked > 0n) {
         await delegationFreeHandler(
           oldDelegate,
-          urn.owner,
+          event.params.owner,
           urn.mkrLocked,
           BigInt(event.block.timestamp),
           BigInt(event.block.number),
@@ -138,7 +138,7 @@ LockstakeEngine.SealSelectVoteDelegate.handler(async ({ event, context }) => {
       if (urn.mkrLocked > 0n) {
         await delegationLockHandler(
           newDelegate,
-          urn.owner,
+          event.params.owner,
           urn.mkrLocked,
           BigInt(event.block.timestamp),
           BigInt(event.block.number),
@@ -234,7 +234,7 @@ LockstakeEngine.SealLock.handler(async ({ event, context }) => {
     if (delegate) {
       await delegationLockHandler(
         delegate,
-        urn.owner,
+        event.params.owner,
         amount,
         BigInt(event.block.timestamp),
         BigInt(event.block.number),
@@ -297,7 +297,7 @@ LockstakeEngine.LockSky.handler(async ({ event, context }) => {
     if (delegate) {
       await delegationLockHandler(
         delegate,
-        urn.owner,
+        event.params.owner,
         mkrAmount,
         BigInt(event.block.timestamp),
         BigInt(event.block.number),
@@ -345,7 +345,7 @@ LockstakeEngine.SealFree.handler(async ({ event, context }) => {
     if (delegate) {
       await delegationFreeHandler(
         delegate,
-        urn.owner,
+        event.params.owner,
         amount,
         BigInt(event.block.timestamp),
         BigInt(event.block.number),
@@ -407,7 +407,7 @@ LockstakeEngine.FreeSky.handler(async ({ event, context }) => {
     if (delegate) {
       await delegationFreeHandler(
         delegate,
-        urn.owner,
+        event.params.owner,
         mkrAmount,
         BigInt(event.block.timestamp),
         BigInt(event.block.number),
@@ -454,7 +454,7 @@ LockstakeEngine.SealFreeNoFee.handler(async ({ event, context }) => {
     if (delegate) {
       await delegationFreeHandler(
         delegate,
-        urn.owner,
+        event.params.owner,
         amount,
         BigInt(event.block.timestamp),
         BigInt(event.block.number),

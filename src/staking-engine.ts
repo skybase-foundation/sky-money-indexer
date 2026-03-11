@@ -78,7 +78,7 @@ StakingEngine.StakingSelectVoteDelegate.handler(async ({ event, context }) => {
     if (oldDelegate && urn.skyLocked > 0n) {
       await delegationFreeHandler(
         oldDelegate,
-        urn.owner,
+        event.params.owner,
         urn.skyLocked,
         BigInt(event.block.timestamp),
         BigInt(event.block.number),
@@ -114,7 +114,7 @@ StakingEngine.StakingSelectVoteDelegate.handler(async ({ event, context }) => {
       if (oldDelegate && urn.skyLocked > 0n) {
         await delegationFreeHandler(
           oldDelegate,
-          urn.owner,
+          event.params.owner,
           urn.skyLocked,
           BigInt(event.block.timestamp),
           BigInt(event.block.number),
@@ -129,7 +129,7 @@ StakingEngine.StakingSelectVoteDelegate.handler(async ({ event, context }) => {
       if (urn.skyLocked > 0n) {
         await delegationLockHandler(
           newDelegate,
-          urn.owner,
+          event.params.owner,
           urn.skyLocked,
           BigInt(event.block.timestamp),
           BigInt(event.block.number),
@@ -209,7 +209,7 @@ StakingEngine.StakingLock.handler(async ({ event, context }) => {
     if (delegate) {
       await delegationLockHandler(
         delegate,
-        urn.owner,
+        event.params.owner,
         amount,
         BigInt(event.block.timestamp),
         BigInt(event.block.number),
@@ -256,7 +256,7 @@ StakingEngine.StakingFree.handler(async ({ event, context }) => {
     if (delegate) {
       await delegationFreeHandler(
         delegate,
-        urn.owner,
+        event.params.owner,
         amount,
         BigInt(event.block.timestamp),
         BigInt(event.block.number),
@@ -303,7 +303,7 @@ StakingEngine.StakingFreeNoFee.handler(async ({ event, context }) => {
     if (delegate) {
       await delegationFreeHandler(
         delegate,
-        urn.owner,
+        event.params.owner,
         amount,
         BigInt(event.block.timestamp),
         BigInt(event.block.number),

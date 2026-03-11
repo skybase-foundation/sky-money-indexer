@@ -3,6 +3,7 @@ description: Sky.money multichain on-chain indexer
 unordered_multichain_mode: true
 rollback_on_reorg: true
 preload_handlers: true
+address_format: lowercase
 schema: schema.graphql
 contracts:
   # === Governance: DSChief (V1) ===
@@ -101,7 +102,7 @@ contracts:
     handler: src/EventHandlers.ts
     abi_file_path: abis/maker/DelegateFactoryV2.json
     events:
-      - event: 'CreateVoteDelegate(address indexed delegate, address indexed voteDelegate)'
+      - event: 'CreateVoteDelegate(address indexed usr, address indexed voteDelegate)'
         field_selection:
           transaction_fields:
             - hash
@@ -110,7 +111,7 @@ contracts:
     handler: src/EventHandlers.ts
     abi_file_path: abis/maker/DelegateFactoryV3.json
     events:
-      - event: 'CreateVoteDelegate(address indexed delegate, address indexed voteDelegate)'
+      - event: 'CreateVoteDelegate(address indexed usr, address indexed voteDelegate)'
         field_selection:
           transaction_fields:
             - hash
@@ -826,6 +827,14 @@ networks:
       - name: PollingEmitterArbitrum
         address:
           - 0x4f4e551b4920a5417F8d4e7f8f099660dAdadcEC
+
+  # Arbitrum Sepolia (HyperSync)
+  - id: 421614
+    start_block: 130000000
+    contracts:
+      - name: PollingEmitterArbitrum
+        address:
+          - 0xE63329692fA90B3efd5eB675c601abeDB2DF715a
 
   # Unichain (HyperSync)
   - id: 130

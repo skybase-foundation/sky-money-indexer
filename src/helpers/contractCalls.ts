@@ -184,7 +184,7 @@ export const readCurvePoolCoinEffect = createEffect(
     rateLimit: { calls: 5, per: 'second' as const },
     cache: true,
   },
-  async ({ input, context }) => {
+  async ({ input }) => {
     try {
       const client = getClient(input.chainId);
       const result = await client.readContract({
@@ -224,7 +224,7 @@ export const readDSChiefSlateEffect = createEffect(
         functionName: 'slates',
         args: [input.slateId as `0x${string}`, input.index],
       });
-      return result as string;
+      return (result as string).toLowerCase();
     } catch {
       // Index out of bounds = end of slate
       return '';

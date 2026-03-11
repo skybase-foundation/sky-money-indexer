@@ -1,9 +1,15 @@
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-export const MKR_TOKEN = '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2';
-export const CHIEF_ADDRESS = '0x0a3f6849f78076aefadf113f5bed87720274ddc0';
-export const CHIEF_V2_ADDRESS = '0x929d9A1435662357F54AdcF64DcEE4d6b867a6f9';
 
-export const GOVERNANCE_TYPE = 'MakerGovernance';
+// Addresses to filter out from delegation handlers (LSE and Staking Engine)
+const IGNORED_DELEGATOR_ADDRESSES = [
+  '0x2b16c07d5fd5cc701a0a871eae2aad6da5fc8f12', // LockstakeEngine (LSE)
+  '0xce01c90de7fd1bcfa39e237fe6d8d9f569e8a6a3', // StakingEngine
+];
+
+export function shouldIgnoreDelegator(address: string): boolean {
+  const lower = address.toLowerCase();
+  return IGNORED_DELEGATOR_ADDRESSES.includes(lower);
+}
 
 export const SpellState = {
   ACTIVE: 'ACTIVE',

@@ -30,13 +30,13 @@ export async function getVoter(
   chainId: number,
   context: handlerContext,
 ): Promise<Voter> {
-  const id = `${chainId}-${address.toLowerCase()}`;
+  const id = `${chainId}-${address}`;
   let voter = await context.Voter.get(id);
   if (!voter) {
     voter = {
       id,
       chainId,
-      address: address.toLowerCase(),
+      address,
       isVoteDelegate: false,
       isVoteProxy: undefined,
       delegateContract_id: undefined,
@@ -121,19 +121,18 @@ export async function createSlate(
     });
     if (!spellAddress) break;
 
-    const spellAddress_ = spellAddress.toLowerCase();
-    if (spellAddress_ !== ZERO_ADDRESS) {
-      const spellId = `${chainId}-${spellAddress_}`;
+    if (spellAddress !== ZERO_ADDRESS) {
+      const spellId = `${chainId}-${spellAddress}`;
       let spell = await context.Spell.get(spellId);
       if (!spell) {
         const [description, expiryTime] = await Promise.all([
           context.effect(readSpellDescriptionEffect, {
             chainId,
-            spellAddress: spellAddress_,
+            spellAddress,
           }),
           context.effect(readSpellExpirationEffect, {
             chainId,
-            spellAddress: spellAddress_,
+            spellAddress,
           }),
         ]);
         // Only save the spell if expiration() didn't revert
@@ -200,19 +199,18 @@ export async function createSlateV2(
     });
     if (!spellAddress) break;
 
-    const spellAddress_ = spellAddress.toLowerCase();
-    if (spellAddress_ !== ZERO_ADDRESS) {
-      const spellId = `${chainId}-${spellAddress_}`;
+    if (spellAddress !== ZERO_ADDRESS) {
+      const spellId = `${chainId}-${spellAddress}`;
       let spell = await context.SpellV2.get(spellId);
       if (!spell) {
         const [description, expiryTime] = await Promise.all([
           context.effect(readSpellDescriptionEffect, {
             chainId,
-            spellAddress: spellAddress_,
+            spellAddress,
           }),
           context.effect(readSpellExpirationEffect, {
             chainId,
-            spellAddress: spellAddress_,
+            spellAddress,
           }),
         ]);
         // Only save the spell if expiration() didn't revert
@@ -221,7 +219,7 @@ export async function createSlateV2(
           spell = {
             id: spellId,
             chainId,
-            address: spellAddress_,
+            address: spellAddress,
             description,
             state: SpellState.ACTIVE,
             creationBlock: BigInt(event.block.number),

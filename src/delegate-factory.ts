@@ -11,9 +11,9 @@ DelegateFactory.CreateVoteDelegate.handler(async ({ event, context }) => {
   const delegateOwnerAddress = event.params.delegate;
   const delegateContractAddress = event.params.voteDelegate;
 
-  const delegateId = `${event.chainId}-${delegateContractAddress.toLowerCase()}`;
-  const voterId = `${event.chainId}-${delegateContractAddress.toLowerCase()}`;
-  const adminId = `${event.chainId}-${delegateOwnerAddress.toLowerCase()}`;
+  const delegateId = `${event.chainId}-${delegateContractAddress}`;
+  const voterId = `${event.chainId}-${delegateContractAddress}`;
+  const adminId = `${event.chainId}-${delegateOwnerAddress}`;
 
   // Create the voter entity
   let voter = await context.Voter.get(voterId);
@@ -21,7 +21,7 @@ DelegateFactory.CreateVoteDelegate.handler(async ({ event, context }) => {
     voter = {
       id: voterId,
       chainId: event.chainId,
-      address: delegateContractAddress.toLowerCase(),
+      address: delegateContractAddress,
       isVoteDelegate: false,
       isVoteProxy: false,
       mkrLockedInChiefRaw: 0n,
@@ -40,7 +40,7 @@ DelegateFactory.CreateVoteDelegate.handler(async ({ event, context }) => {
   }
   context.Voter.set({
     ...voter,
-    address: delegateContractAddress.toLowerCase(),
+    address: delegateContractAddress,
     isVoteDelegate: true,
     isVoteProxy: false,
     delegateContract_id: delegateId,
@@ -51,7 +51,7 @@ DelegateFactory.CreateVoteDelegate.handler(async ({ event, context }) => {
   if (!delegateInfo) {
     delegateInfo = {
       id: delegateId,
-      address: delegateContractAddress.toLowerCase(),
+      address: delegateContractAddress,
       ownerAddress: delegateOwnerAddress,
       voter_id: voterId,
       delegators: 0,

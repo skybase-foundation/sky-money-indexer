@@ -13,7 +13,7 @@ async function getArbitrumVoter(
     voter = {
       id,
       chainId: chainId,
-      address: address.toLowerCase(),
+      address: address,
       numberPollVotes: 0,
       lastVotedTimestamp: 0n,
     };

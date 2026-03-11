@@ -1,16 +1,5 @@
 import { VoteDelegateV3 } from 'generated';
-
-// LSE and Staking Engine addresses to filter out
-const LSE_ADDRESSES = ['0x2b16c07d5fd5cc701a0a871eae2aad6da5fc8f12'];
-
-const STAKING_ENGINE_ADDRESSES = ['0xce01c90de7fd1bcfa39e237fe6d8d9f569e8a6a3'];
-
-function shouldIgnoreAddress(address: string): boolean {
-  const lower = address.toLowerCase();
-  return (
-    LSE_ADDRESSES.includes(lower) || STAKING_ENGINE_ADDRESSES.includes(lower)
-  );
-}
+import { shouldIgnoreDelegator } from './helpers/constants';
 
 VoteDelegateV3.Lock.handler(async ({ event, context }) => {
   const sender = event.params.usr;
@@ -23,7 +12,7 @@ VoteDelegateV3.Lock.handler(async ({ event, context }) => {
   if (!delegate) return;
 
   // Staking engine delegations are already handled in the lockstake engine handlers
-  if (shouldIgnoreAddress(sender)) return;
+  if (shouldIgnoreDelegator(sender)) return;
 
   // Get or create delegation
   const delegationId = `${delegate.id}-${sender}`;
@@ -91,7 +80,7 @@ VoteDelegateV3.Free.handler(async ({ event, context }) => {
   if (!delegate) return;
 
   // Staking engine delegations are already handled in the lockstake engine handlers
-  if (shouldIgnoreAddress(sender)) return;
+  if (shouldIgnoreDelegator(sender)) return;
 
   // Get or create delegation
   const delegationId = `${delegate.id}-${sender}`;

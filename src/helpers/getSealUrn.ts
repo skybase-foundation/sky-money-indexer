@@ -6,13 +6,13 @@ export async function getSealUrn(
   chainId: number,
   context: handlerContext,
 ): Promise<SealUrn> {
-  const id = `${chainId}-${urnAddress.toLowerCase()}`;
+  const id = `${chainId}-${urnAddress}`;
   let urn = await context.SealUrn.get(id);
   if (!urn) {
     urn = {
       id,
       chainId,
-      address: urnAddress.toLowerCase(),
+      address: urnAddress,
       owner: ZERO_ADDRESS,
       index: 0n,
       blockNumber: 0n,

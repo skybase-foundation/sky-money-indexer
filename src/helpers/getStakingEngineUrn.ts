@@ -6,13 +6,13 @@ export async function getStakingEngineUrn(
   chainId: number,
   context: handlerContext,
 ): Promise<StakingUrn> {
-  const id = `${chainId}-${urnAddress.toLowerCase()}`;
+  const id = `${chainId}-${urnAddress}`;
   let urn = await context.StakingUrn.get(id);
   if (!urn) {
     urn = {
       id,
       chainId,
-      address: urnAddress.toLowerCase(),
+      address: urnAddress,
       owner: ZERO_ADDRESS,
       index: 0n,
       blockNumber: 0n,
