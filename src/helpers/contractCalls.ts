@@ -4,7 +4,7 @@ import {
   type PublicClient,
   type Address,
 } from 'viem';
-import { mainnet, base, optimism, arbitrum, unichain } from 'viem/chains';
+import { mainnet } from 'viem/chains';
 import type { Chain } from 'viem';
 import { createEffect, S } from 'envio';
 
@@ -74,13 +74,8 @@ const curveCoinsAbi = [
 
 // RPC URLs per chain
 const RPC_URLS: Record<number, string> = {
-  1: process.env.MAINNET_RPC_URL || '',
-  314310:
-    'https://virtual.rpc.tenderly.co/jetstreamgg/jetstream/public/jetstream-testnet',
-  8453: process.env.BASE_RPC_URL || '',
-  10: process.env.OPTIMISM_RPC_URL || '',
-  42161: process.env.ARBITRUM_RPC_URL || '',
-  130: process.env.UNICHAIN_RPC_URL || '',
+  1: process.env.ENVIO_MAINNET_RPC_URL || '',
+  314310: process.env.ENVIO_TENDERLY_RPC_URL || '',
 };
 
 // Tenderly fork inherits mainnet config but with its own chain ID
@@ -94,10 +89,6 @@ const tenderly: Chain = {
 const CHAINS: Record<number, Chain> = {
   1: mainnet,
   314310: tenderly,
-  8453: base,
-  10: optimism,
-  42161: arbitrum,
-  130: unichain,
 };
 
 // Pre-create public clients per chain at module level
