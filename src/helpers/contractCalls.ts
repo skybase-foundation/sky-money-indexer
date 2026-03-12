@@ -75,7 +75,9 @@ const curveCoinsAbi = [
 // RPC URLs per chain
 const RPC_URLS: Record<number, string> = {
   1: process.env.ENVIO_MAINNET_RPC_URL || '',
-  314310: process.env.ENVIO_TENDERLY_RPC_URL || '',
+  314310:
+    `https://virtual.rpc.tenderly.co/${process.env.ENVIO_TENDERLY_TESTNET_PATH}` ||
+    '',
 };
 
 // Tenderly fork inherits mainnet config but with its own chain ID

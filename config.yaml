@@ -706,7 +706,7 @@ networks:
   # Tenderly Testnet (RPC fallback)
   - id: 314310
     rpc_config:
-      url: https://virtual.rpc.tenderly.co/jetstreamgg/jetstream/public/jetstream-testnet
+      url: https://virtual.rpc.tenderly.co/{ENVIO_TENDERLY_TESTNET_PATH}
     start_block: 8122207
     contracts:
       - name: DSChiefV2
