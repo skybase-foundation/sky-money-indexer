@@ -46,7 +46,7 @@ cp .env.sample .env
 Environment variables:
 
 - `ENVIO_API_TOKEN` - Required for HyperSync
-- `MAINNET_RPC_URL`, `BASE_RPC_URL`, `OPTIMISM_RPC_URL`, `ARBITRUM_RPC_URL`, `UNICHAIN_RPC_URL` - RPC URLs for contract read calls
+- `ENVIO_MAINNET_RPC_URL`, `ENVIO_TENDERLY_TESTNET_PATH` - RPC URLs for contract read calls
 
 ## Development
 
