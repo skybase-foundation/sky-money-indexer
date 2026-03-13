@@ -577,6 +577,30 @@ contracts:
           transaction_fields:
             - hash
 
+  # === PSM3 (multi-chain, not deployed on Tenderly but needed for shared generated types) ===
+  - name: Psm3
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/psm/Psm3.json
+    events:
+      - event: 'Swap(address indexed assetIn, address indexed assetOut, address sender, address indexed receiver, uint256 amountIn, uint256 amountOut, uint256 referralCode)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === Governance: Arbitrum Polling (not deployed on Tenderly but needed for shared generated types) ===
+  - name: PollingEmitterArbitrum
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/PollingEmitter.json
+    events:
+      - event: 'Voted(address indexed voter, uint256 indexed pollId, uint256 indexed optionId)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'PollCreated(address indexed creator, uint256 blockCreated, uint256 indexed pollId, uint256 startDate, uint256 endDate, string multiHash, string url)'
+        field_selection:
+          transaction_fields:
+            - hash
+
   # === Liquidations ===
   - name: McdDog
     handler: src/EventHandlers.ts
