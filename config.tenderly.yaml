@@ -1,4 +1,4 @@
-name: sky-money-indexer-tenderly
+name: sky-indexer-tenderly
 description: Sky.money multichain on-chain indexer
 unordered_multichain_mode: true
 rollback_on_reorg: true
