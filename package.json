@@ -2,9 +2,13 @@
   "name": "sky-money-indexer",
   "scripts": {
     "codegen": "envio codegen",
+    "codegen:tenderly": "envio codegen --config config.tenderly.yaml",
     "dev": "envio dev",
+    "dev:tenderly": "envio dev --config config.tenderly.yaml",
     "start": "envio start",
+    "start:tenderly": "envio start --config config.tenderly.yaml",
     "stop": "envio stop",
+    "stop:tenderly": "envio stop --config config.tenderly.yaml",
     "test": "vitest"
   },
   "dependencies": {

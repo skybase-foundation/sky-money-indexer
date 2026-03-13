@@ -1,4 +1,4 @@
-name: sky-money-indexer
+name: sky-money-indexer-tenderly
 description: Sky.money multichain on-chain indexer
 unordered_multichain_mode: true
 rollback_on_reorg: true
@@ -60,20 +60,6 @@ contracts:
           transaction_fields:
             - hash
       - event: 'PollWithdrawn(address indexed creator, uint256 blockWithdrawn, uint256 pollId)'
-        field_selection:
-          transaction_fields:
-            - hash
-
-  # === Governance: Arbitrum Polling ===
-  - name: PollingEmitterArbitrum
-    handler: src/EventHandlers.ts
-    abi_file_path: abis/maker/PollingEmitter.json
-    events:
-      - event: 'Voted(address indexed voter, uint256 indexed pollId, uint256 indexed optionId)'
-        field_selection:
-          transaction_fields:
-            - hash
-      - event: 'PollCreated(address indexed creator, uint256 blockCreated, uint256 indexed pollId, uint256 startDate, uint256 endDate, string multiHash, string url)'
         field_selection:
           transaction_fields:
             - hash
@@ -601,16 +587,6 @@ contracts:
           transaction_fields:
             - hash
 
-  # === PSM3 (multi-chain) ===
-  - name: Psm3
-    handler: src/EventHandlers.ts
-    abi_file_path: abis/psm/Psm3.json
-    events:
-      - event: 'Swap(address indexed assetIn, address indexed assetOut, address sender, address indexed receiver, uint256 amountIn, uint256 amountOut, uint256 referralCode)'
-        field_selection:
-          transaction_fields:
-            - hash
-
   # === Curve Pool ===
   - name: CurveUsdsStUsdsPool
     handler: src/EventHandlers.ts
@@ -623,8 +599,10 @@ contracts:
 
 # === Network Configuration ===
 networks:
-  # Ethereum Mainnet (HyperSync)
-  - id: 1
+  # Tenderly Testnet (RPC fallback)
+  - id: 314310
+    rpc_config:
+      url: https://virtual.rpc.tenderly.co/${ENVIO_TENDERLY_TESTNET_PATH}
     start_block: 8122207
     contracts:
       - name: DSChiefV2
@@ -686,7 +664,7 @@ networks:
           - 0xA1Ea1bA18E88C381C724a75F23a130420C403f9a
       - name: LockstakeClipper
         address:
-          - 0xA85621D35cAf9Cf5C146D2376Ce553D7B78A6239
+          - 0x2e590d65dd357a7565efb5ffb329f8465f18c494
       - name: LockstakeMkr
         address:
           - 0xb4e0e45e142101dC3Ed768bac219fC35EDBED295
@@ -702,46 +680,3 @@ networks:
       - name: CurveUsdsStUsdsPool
         address:
           - 0x2C7C98A3b1582D83c43987202aEFf638312478aE
-
-  # Base (HyperSync)
-  - id: 8453
-    start_block: 21452622
-    contracts:
-      - name: Psm3
-        address:
-          - 0x1601843c5E9bC251A3272907010AFa41Fa18347E
-
-  # Optimism (HyperSync)
-  - id: 10
-    start_block: 135509927
-    contracts:
-      - name: Psm3
-        address:
-          - 0xe0F9978b907853F354d79188A3dEfbD41978af62
-
-  # Arbitrum (HyperSync)
-  - id: 42161
-    start_block: 24755861
-    contracts:
-      - name: Psm3
-        address:
-          - 0x2B05F8e1cACC6974fD79A673a341Fe1f58d27266
-      - name: PollingEmitterArbitrum
-        address:
-          - 0x4f4e551b4920a5417F8d4e7f8f099660dAdadcEC
-
-  # Arbitrum Sepolia (HyperSync)
-  - id: 421614
-    start_block: 130000000
-    contracts:
-      - name: PollingEmitterArbitrum
-        address:
-          - 0xE63329692fA90B3efd5eB675c601abeDB2DF715a
-
-  # Unichain (HyperSync)
-  - id: 130
-    start_block: 16411311
-    contracts:
-      - name: Psm3
-        address:
-          - 0x7b42Ed932f26509465F7cE3FAF76FfCe1275312f
