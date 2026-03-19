@@ -627,6 +627,12 @@ networks:
   - id: 314310
     rpc_config:
       url: https://virtual.rpc.tenderly.co/${ENVIO_TENDERLY_TESTNET_PATH}
+      initial_block_interval: 2000
+      interval_ceiling: 5000
+      backoff_multiplicative: 0.5
+      acceleration_additive: 100
+      backoff_millis: 5000
+      query_timeout_millis: 30000
     start_block: 8122207
     contracts:
       - name: DSChiefV2
