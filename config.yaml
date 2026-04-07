@@ -611,6 +611,22 @@ contracts:
           transaction_fields:
             - hash
 
+  # === LitePSM (mainnet only — wraps sellGem/buyGem for USDC↔USDS 1:1 conversions) ===
+  - name: DssLitePsm
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/psm/DssLitePsm.json
+    events:
+      - event: 'SellGem(address indexed owner, uint256 value, uint256 fee)'
+        field_selection:
+          transaction_fields:
+            - hash
+            - from
+      - event: 'BuyGem(address indexed owner, uint256 value, uint256 fee)'
+        field_selection:
+          transaction_fields:
+            - hash
+            - from
+
   # === Curve Pool ===
   - name: CurveUsdsStUsdsPool
     handler: src/EventHandlers.ts
@@ -702,6 +718,9 @@ networks:
       - name: CurveUsdsStUsdsPool
         address:
           - 0x2C7C98A3b1582D83c43987202aEFf638312478aE
+      - name: DssLitePsm
+        address:
+          - 0xf6e72Db5454dd049d0788e411b06CfAF16853042
 
   # Base (HyperSync)
   - id: 8453

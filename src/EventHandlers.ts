@@ -20,6 +20,7 @@ import './rewards';
 
 // === PSM ===
 import './psm3';
+import './lite-psm';
 
 // === Curve ===
 import './curveUsdsStUsdsPool';
