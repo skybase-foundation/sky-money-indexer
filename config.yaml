@@ -640,7 +640,6 @@ contracts:
 # === Network Configuration ===
 networks:
   # Ethereum Mainnet (HyperSync)
-  # Ethereum Mainnet (HyperSync)
   - id: 1
     start_block: 8122207
     contracts:
