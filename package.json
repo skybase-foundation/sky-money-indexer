@@ -12,7 +12,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "envio": "^2.32.3",
+    "envio": "^2.32.12",
     "viem": "^2.46.2"
   },
   "optionalDependencies": {
