@@ -10,17 +10,17 @@ importers:
     dependencies:
       envio:
         specifier: ^2.32.12
-        version: 2.32.12(typescript@5.9.3)
+        version: 2.32.12(typescript@6.0.2)
       viem:
         specifier: ^2.46.2
-        version: 2.46.2(typescript@5.9.3)
+        version: 2.46.2(typescript@6.0.2)
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
         version: 22.19.11
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^6.0.2
+        version: 6.0.2
       vitest:
         specifier: ^2.0.0
         version: 2.1.9(@types/node@22.19.11)
@@ -880,8 +880,8 @@ packages:
     resolution: {integrity: sha512-n1cw8k1k0x4pgA2+9XrOkFydTerNcJ1zWCO5Nn9scWHTD+5tp8dghT2x1uduQePZTZgd3Tupf+x9BxJjeJi77Q==}
     engines: {node: '>=14.0.0'}
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+  typescript@6.0.2:
+    resolution: {integrity: sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -1304,13 +1304,13 @@ snapshots:
       loupe: 3.2.1
       tinyrainbow: 1.2.0
 
-  abitype@1.0.5(typescript@5.9.3):
+  abitype@1.0.5(typescript@6.0.2):
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.2
 
-  abitype@1.2.3(typescript@5.9.3):
+  abitype@1.2.3(typescript@6.0.2):
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.2
 
   abort-controller@3.0.0:
     dependencies:
@@ -1384,7 +1384,7 @@ snapshots:
   envio-linux-x64@2.32.12:
     optional: true
 
-  envio@2.32.12(typescript@5.9.3):
+  envio@2.32.12(typescript@6.0.2):
     dependencies:
       '@elastic/ecs-pino-format': 1.4.0
       '@envio-dev/hyperfuel-client': 1.2.2
@@ -1396,7 +1396,7 @@ snapshots:
       prom-client: 15.0.0
       rescript: 11.1.3
       rescript-schema: 9.3.0(rescript@11.1.3)
-      viem: 2.21.0(typescript@5.9.3)
+      viem: 2.21.0(typescript@6.0.2)
     optionalDependencies:
       envio-darwin-arm64: 2.32.12
       envio-darwin-x64: 2.32.12
@@ -1532,7 +1532,7 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  ox@0.12.4(typescript@5.9.3):
+  ox@0.12.4(typescript@6.0.2):
     dependencies:
       '@adraffy/ens-normalize': 1.11.1
       '@noble/ciphers': 1.3.0
@@ -1540,10 +1540,10 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.9.3)
+      abitype: 1.2.3(typescript@6.0.2)
       eventemitter3: 5.0.1
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - zod
 
@@ -1721,7 +1721,7 @@ snapshots:
 
   tinyspy@3.0.2: {}
 
-  typescript@5.9.3: {}
+  typescript@6.0.2: {}
 
   undici-types@6.21.0: {}
 
@@ -1731,36 +1731,36 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  viem@2.21.0(typescript@5.9.3):
+  viem@2.21.0(typescript@6.0.2):
     dependencies:
       '@adraffy/ens-normalize': 1.10.0
       '@noble/curves': 1.4.0
       '@noble/hashes': 1.4.0
       '@scure/bip32': 1.4.0
       '@scure/bip39': 1.3.0
-      abitype: 1.0.5(typescript@5.9.3)
+      abitype: 1.0.5(typescript@6.0.2)
       isows: 1.0.4(ws@8.17.1)
       webauthn-p256: 0.0.5
       ws: 8.17.1
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
       - zod
 
-  viem@2.46.2(typescript@5.9.3):
+  viem@2.46.2(typescript@6.0.2):
     dependencies:
       '@noble/curves': 1.9.1
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.9.3)
+      abitype: 1.2.3(typescript@6.0.2)
       isows: 1.0.7(ws@8.18.3)
-      ox: 0.12.4(typescript@5.9.3)
+      ox: 0.12.4(typescript@6.0.2)
       ws: 8.18.3
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
