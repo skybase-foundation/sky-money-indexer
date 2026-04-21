@@ -328,6 +328,10 @@ contracts:
         field_selection:
           transaction_fields:
             - hash
+      - event: 'Cut(uint256 assets, uint256 oldChi, uint256 newChi)'
+        field_selection:
+          transaction_fields:
+            - hash
 
   # === Token Conversions ===
   - name: DaiUsds

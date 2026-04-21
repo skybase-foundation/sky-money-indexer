@@ -1097,6 +1097,17 @@ type StusdsReferral {
   transactionHash: String!
 }
 
+type StusdsCut {
+  id: ID!
+  chainId: Int! @index
+  assets: BigInt!
+  oldChi: BigInt!
+  newChi: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
 type CurveTokenExchange {
   id: ID!
   chainId: Int! @index
