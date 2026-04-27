@@ -48,3 +48,18 @@ Stusds.Referral.handler(async ({ event, context }) => {
     transactionHash: event.transaction.hash,
   });
 });
+
+Stusds.Cut.handler(async ({ event, context }) => {
+  const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
+
+  context.StusdsCut.set({
+    id,
+    chainId: event.chainId,
+    assets: event.params.assets,
+    oldChi: event.params.oldChi,
+    newChi: event.params.newChi,
+    blockNumber: BigInt(event.block.number),
+    blockTimestamp: BigInt(event.block.timestamp),
+    transactionHash: event.transaction.hash,
+  });
+});
