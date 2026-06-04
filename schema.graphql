@@ -1101,7 +1101,7 @@ type SusdtDeposit {
   id: ID!
   chainId: Int! @index
   sender: String!
-  owner: String!
+  owner: String! @index
   assets: BigInt!
   shares: BigInt!
   blockNumber: BigInt!
@@ -1114,7 +1114,7 @@ type SusdtWithdraw {
   chainId: Int! @index
   sender: String!
   receiver: String!
-  owner: String!
+  owner: String! @index
   assets: BigInt!
   shares: BigInt!
   blockNumber: BigInt!
