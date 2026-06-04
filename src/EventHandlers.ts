@@ -14,6 +14,7 @@ import './mkr-sky-v2';
 // === Savings & Staking ===
 import './savings-usds';
 import './stusds';
+import './susdt';
 
 // === Rewards ===
 import './rewards';
