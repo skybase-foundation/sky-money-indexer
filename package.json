@@ -1,5 +1,6 @@
 {
   "name": "sky-money-indexer",
+  "packageManager": "pnpm@11.5.0",
   "scripts": {
     "codegen": "envio codegen",
     "codegen:tenderly": "envio codegen --config config.tenderly.yaml",
