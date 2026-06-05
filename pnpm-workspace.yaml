@@ -1,0 +1,10 @@
+# Delay installing newly published versions to reduce supply-chain risk.
+# Value is in minutes; 10080 = 1 week (7 * 24 * 60).
+minimumReleaseAge: 10080
+
+# Dependencies allowed to run install/build scripts (pnpm v11 replaces
+# onlyBuiltDependencies with this map). Both are required by Envio:
+# rescript compiles the ReScript toolchain, esbuild fetches its native binary.
+allowBuilds:
+  esbuild: true
+  rescript: true
