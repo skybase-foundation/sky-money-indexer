@@ -1,4 +1,4 @@
-import { DssLitePsm } from 'generated';
+import { indexer } from 'envio';
 
 // Mainnet token addresses
 const USDC_MAINNET = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
@@ -10,7 +10,7 @@ const TO_18_CONVERSION_FACTOR = BigInt(1e12);
 // SellGem: user sells USDC, receives USDS (USDC → USDS)
 // Note: when routed through the usdsPsmWrapper (0xA188...), event.params.owner
 // is the wrapper address, not the user. We use transaction.from for the real user.
-DssLitePsm.SellGem.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'DssLitePsm', event: 'SellGem' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
   const sender = event.transaction.from ?? '';
   const usdcAmount = event.params.value;
@@ -34,7 +34,7 @@ DssLitePsm.SellGem.handler(async ({ event, context }) => {
 
 // BuyGem: user sells USDS, receives USDC (USDS → USDC)
 // Note: event.params.owner is always the real user here (wrapper passes usr through).
-DssLitePsm.BuyGem.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'DssLitePsm', event: 'BuyGem' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
   const sender = event.transaction.from ?? event.params.owner;
   const usdcAmount = event.params.value;

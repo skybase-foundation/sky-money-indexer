@@ -1,6 +1,6 @@
-import { LockstakeMkr } from 'generated';
+import { indexer } from 'envio';
 
-LockstakeMkr.LockstakeMkrRely.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeMkr', event: 'LockstakeMkrRely' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.LockstakeMkrRely.set({
@@ -13,7 +13,7 @@ LockstakeMkr.LockstakeMkrRely.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeMkr.LockstakeMkrDeny.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeMkr', event: 'LockstakeMkrDeny' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.LockstakeMkrDeny.set({
@@ -26,7 +26,7 @@ LockstakeMkr.LockstakeMkrDeny.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeMkr.Approval.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeMkr', event: 'Approval' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.LockstakeMkrApproval.set({
@@ -41,7 +41,7 @@ LockstakeMkr.Approval.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeMkr.Transfer.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeMkr', event: 'Transfer' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.LockstakeMkrTransfer.set({

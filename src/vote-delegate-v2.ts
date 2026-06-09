@@ -1,7 +1,7 @@
-import { VoteDelegateV2 } from 'generated';
+import { indexer } from 'envio';
 import { shouldIgnoreDelegator } from './helpers/constants';
 
-VoteDelegateV2.Lock.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'VoteDelegateV2', event: 'Lock' }, async ({ event, context }) => {
   const sender = event.params.usr;
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;
@@ -69,7 +69,7 @@ VoteDelegateV2.Lock.handler(async ({ event, context }) => {
   });
 });
 
-VoteDelegateV2.Free.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'VoteDelegateV2', event: 'Free' }, async ({ event, context }) => {
   const sender = event.params.usr;
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;
@@ -139,6 +139,6 @@ VoteDelegateV2.Free.handler(async ({ event, context }) => {
 });
 
 // ReserveHatch handler - placeholder, no logic needed
-VoteDelegateV2.ReserveHatch.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'VoteDelegateV2', event: 'ReserveHatch' }, async ({ event, context }) => {
   // No-op: placeholder for the ReserveHatch event
 });

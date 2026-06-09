@@ -1,7 +1,7 @@
-import { VoteDelegateV3 } from 'generated';
+import { indexer } from 'envio';
 import { shouldIgnoreDelegator } from './helpers/constants';
 
-VoteDelegateV3.Lock.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'VoteDelegateV3', event: 'Lock' }, async ({ event, context }) => {
   const sender = event.params.usr;
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;
@@ -69,7 +69,7 @@ VoteDelegateV3.Lock.handler(async ({ event, context }) => {
   });
 });
 
-VoteDelegateV3.Free.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'VoteDelegateV3', event: 'Free' }, async ({ event, context }) => {
   const sender = event.params.usr;
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;

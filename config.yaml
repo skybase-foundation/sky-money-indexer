@@ -1,8 +1,6 @@
 name: sky-money-indexer
 description: Sky.money multichain on-chain indexer
-unordered_multichain_mode: true
 rollback_on_reorg: true
-preload_handlers: true
 address_format: lowercase
 schema: schema.graphql
 contracts:
@@ -659,7 +657,7 @@ contracts:
             - hash
 
 # === Network Configuration ===
-networks:
+chains:
   # Ethereum Mainnet (HyperSync)
   - id: 1
     start_block: 8122207

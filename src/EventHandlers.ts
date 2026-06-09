@@ -2,7 +2,7 @@
  * Main entry point for all Envio/HyperIndex event handlers.
  *
  * Each handler file registers its own handlers via the
- * ContractName.EventName.handler() and ContractName.EventName.contractRegister() APIs.
+ * indexer.onEvent() and indexer.contractRegister() APIs.
  * This file simply imports all handler modules to ensure they are registered.
  */
 

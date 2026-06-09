@@ -1,6 +1,6 @@
-import { Stusds } from 'generated';
+import { indexer } from 'envio';
 
-Stusds.Deposit.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'Stusds', event: 'Deposit' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.StusdsDeposit.set({
@@ -16,7 +16,7 @@ Stusds.Deposit.handler(async ({ event, context }) => {
   });
 });
 
-Stusds.Withdraw.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'Stusds', event: 'Withdraw' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.StusdsWithdraw.set({
@@ -33,7 +33,7 @@ Stusds.Withdraw.handler(async ({ event, context }) => {
   });
 });
 
-Stusds.Referral.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'Stusds', event: 'Referral' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.StusdsReferral.set({
@@ -49,7 +49,7 @@ Stusds.Referral.handler(async ({ event, context }) => {
   });
 });
 
-Stusds.Cut.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'Stusds', event: 'Cut' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.StusdsCut.set({

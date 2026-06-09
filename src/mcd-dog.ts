@@ -1,6 +1,6 @@
-import { McdDog } from 'generated';
+import { indexer } from 'envio';
 
-McdDog.Bark.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'McdDog', event: 'Bark' }, async ({ event, context }) => {
   const barkId = `${event.chainId}-${event.params.ilk}-${event.params.id}`;
 
   // Attempt to load existing SealUrn

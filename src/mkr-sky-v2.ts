@@ -1,6 +1,6 @@
-import { MkrSkyV2 } from 'generated';
+import { indexer } from 'envio';
 
-MkrSkyV2.MkrToSky.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'MkrSkyV2', event: 'MkrToSky' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.MkrToSkyUpgradeV2.set({

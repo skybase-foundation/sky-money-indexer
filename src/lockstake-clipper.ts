@@ -1,6 +1,6 @@
-import { LockstakeClipper } from 'generated';
+import { indexer } from 'envio';
 
-LockstakeClipper.Rely.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeClipper', event: 'Rely' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Rely.set({
@@ -13,7 +13,7 @@ LockstakeClipper.Rely.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeClipper.Deny.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeClipper', event: 'Deny' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Deny.set({
@@ -26,7 +26,7 @@ LockstakeClipper.Deny.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeClipper.FileUint.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeClipper', event: 'FileUint' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.FileUint.set({
@@ -40,7 +40,7 @@ LockstakeClipper.FileUint.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeClipper.FileAddress.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeClipper', event: 'FileAddress' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.FileAddress.set({
@@ -54,7 +54,7 @@ LockstakeClipper.FileAddress.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeClipper.Kick.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeClipper', event: 'Kick' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Kick.set({
@@ -72,7 +72,7 @@ LockstakeClipper.Kick.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeClipper.Take.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeClipper', event: 'Take' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Take.set({
@@ -90,7 +90,7 @@ LockstakeClipper.Take.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeClipper.Redo.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeClipper', event: 'Redo' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Redo.set({
@@ -108,7 +108,7 @@ LockstakeClipper.Redo.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeClipper.Yank.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeClipper', event: 'Yank' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Yank.set({

@@ -1,10 +1,12 @@
-import type { handlerContext, SealUrn } from 'generated';
+import type { EvmOnEventContext, Entity } from 'envio';
 import { ZERO_ADDRESS } from './constants';
+
+type SealUrn = Entity<'SealUrn'>;
 
 export async function getSealUrn(
   urnAddress: string,
   chainId: number,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<SealUrn> {
   const id = `${chainId}-${urnAddress}`;
   let urn = await context.SealUrn.get(id);
