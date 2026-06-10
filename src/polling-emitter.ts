@@ -1,10 +1,5 @@
-import { PollingEmitter, PollingEmitterV2 } from 'generated';
-import type {
-  handlerContext,
-  PollingEmitter_PollCreated_event,
-  PollingEmitter_PollWithdrawn_event,
-  PollingEmitter_Voted_event,
-} from 'generated';
+import { indexer } from 'envio';
+import type { EvmEvent, EvmOnEventContext } from 'envio';
 import { getVoter } from './helpers/helpers';
 
 // Helper: create a default Poll entity with all required fields
@@ -26,8 +21,10 @@ function createDefaultPoll(pollId: string, chainId: number, pollIdNum: bigint) {
 
 // Handler logic: PollCreated
 async function handlePollCreated(
-  event: PollingEmitter_PollCreated_event,
-  context: handlerContext,
+  event:
+    | EvmEvent<'PollingEmitter', 'PollCreated'>
+    | EvmEvent<'PollingEmitterV2', 'PollCreated'>,
+  context: EvmOnEventContext,
 ) {
   const creator = event.params.creator;
   const blockCreated = event.params.blockCreated;
@@ -59,8 +56,10 @@ async function handlePollCreated(
 
 // Handler logic: PollWithdrawn
 async function handlePollWithdrawn(
-  event: PollingEmitter_PollWithdrawn_event,
-  context: handlerContext,
+  event:
+    | EvmEvent<'PollingEmitter', 'PollWithdrawn'>
+    | EvmEvent<'PollingEmitterV2', 'PollWithdrawn'>,
+  context: EvmOnEventContext,
 ) {
   const creator = event.params.creator;
   const blockWithdrawn = event.params.blockWithdrawn;
@@ -79,8 +78,10 @@ async function handlePollWithdrawn(
 
 // Handler logic: Voted
 async function handlePollVote(
-  event: PollingEmitter_Voted_event,
-  context: handlerContext,
+  event:
+    | EvmEvent<'PollingEmitter', 'Voted'>
+    | EvmEvent<'PollingEmitterV2', 'Voted'>,
+  context: EvmOnEventContext,
 ) {
   const sender = event.params.voter;
   const pollId = `${event.chainId}-${event.params.pollId.toString()}`;
@@ -129,27 +130,27 @@ async function handlePollVote(
 }
 
 // --- PollingEmitter ---
-PollingEmitter.PollCreated.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'PollingEmitter', event: 'PollCreated' }, async ({ event, context }) => {
   await handlePollCreated(event, context);
 });
 
-PollingEmitter.PollWithdrawn.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'PollingEmitter', event: 'PollWithdrawn' }, async ({ event, context }) => {
   await handlePollWithdrawn(event, context);
 });
 
-PollingEmitter.Voted.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'PollingEmitter', event: 'Voted' }, async ({ event, context }) => {
   await handlePollVote(event, context);
 });
 
 // --- PollingEmitterV2 ---
-PollingEmitterV2.PollCreated.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'PollingEmitterV2', event: 'PollCreated' }, async ({ event, context }) => {
   await handlePollCreated(event, context);
 });
 
-PollingEmitterV2.PollWithdrawn.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'PollingEmitterV2', event: 'PollWithdrawn' }, async ({ event, context }) => {
   await handlePollWithdrawn(event, context);
 });
 
-PollingEmitterV2.Voted.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'PollingEmitterV2', event: 'Voted' }, async ({ event, context }) => {
   await handlePollVote(event, context);
 });

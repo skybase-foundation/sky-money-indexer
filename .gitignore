@@ -1,6 +1,6 @@
 node_modules/
 build/
-generated/
+.envio/
 .env
 data/ipfs
 data/postgres

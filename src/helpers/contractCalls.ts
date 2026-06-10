@@ -275,7 +275,7 @@ export const readSpellExpirationEffect = createEffect(
       });
       return result as bigint;
     } catch {
-      return undefined;
+      return null;
     }
   },
 );

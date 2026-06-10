@@ -1,6 +1,6 @@
-import { Psm3 } from 'generated';
+import { indexer } from 'envio';
 
-Psm3.Swap.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'Psm3', event: 'Swap' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.Swap.set({

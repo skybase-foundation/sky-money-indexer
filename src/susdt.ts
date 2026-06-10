@@ -1,6 +1,6 @@
-import { Susdt } from 'generated';
+import { indexer } from 'envio';
 
-Susdt.Deposit.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'Susdt', event: 'Deposit' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.SusdtDeposit.set({
@@ -16,7 +16,7 @@ Susdt.Deposit.handler(async ({ event, context }) => {
   });
 });
 
-Susdt.Withdraw.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'Susdt', event: 'Withdraw' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.SusdtWithdraw.set({
@@ -33,7 +33,7 @@ Susdt.Withdraw.handler(async ({ event, context }) => {
   });
 });
 
-Susdt.Referral.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'Susdt', event: 'Referral' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.SusdtReferral.set({

@@ -1,4 +1,4 @@
-import { LockstakeEngine, Delegate } from 'generated';
+import { indexer, type Entity } from 'envio';
 import { getSealUrn } from './helpers/getSealUrn';
 import {
   getDelegate,
@@ -12,13 +12,15 @@ import {
 } from './helpers/contractCalls';
 import { ZERO_ADDRESS } from './helpers/constants';
 
+type Delegate = Entity<'Delegate'>;
+
 // MkrSky contract addresses per chain
 const MKR_SKY_ADDRESSES: Record<number, string> = {
   1: '0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B',
   314310: '0xBDcFCA946b6CDd965f99a839e4435Bcdc1bc470B',
 };
 
-LockstakeEngine.SealOpen.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealOpen' }, async ({ event, context }) => {
   const urn = await getSealUrn(event.params.urn, event.chainId, context);
 
   const updatedUrn = {
@@ -44,7 +46,7 @@ LockstakeEngine.SealOpen.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.SealSelectVoteDelegate.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealSelectVoteDelegate' }, async ({ event, context }) => {
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
     engineAddress: event.srcAddress,
@@ -154,7 +156,7 @@ LockstakeEngine.SealSelectVoteDelegate.handler(async ({ event, context }) => {
   }
 });
 
-LockstakeEngine.SealSelectFarm.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealSelectFarm' }, async ({ event, context }) => {
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
     engineAddress: event.srcAddress,
@@ -184,7 +186,7 @@ LockstakeEngine.SealSelectFarm.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.SealAddFarm.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealAddFarm' }, async ({ event, context }) => {
   let reward = await getReward(event.params.farm, event.chainId, context);
   context.Reward.set({
     ...reward,
@@ -192,7 +194,7 @@ LockstakeEngine.SealAddFarm.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.SealDelFarm.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealDelFarm' }, async ({ event, context }) => {
   let reward = await getReward(event.params.farm, event.chainId, context);
   context.Reward.set({
     ...reward,
@@ -200,7 +202,7 @@ LockstakeEngine.SealDelFarm.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.SealLock.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealLock' }, async ({ event, context }) => {
   const amount = event.params.wad;
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
@@ -249,7 +251,7 @@ LockstakeEngine.SealLock.handler(async ({ event, context }) => {
   }
 });
 
-LockstakeEngine.LockSky.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'LockSky' }, async ({ event, context }) => {
   const amount = event.params.skyWad;
   const mkrSkyAddress = MKR_SKY_ADDRESSES[event.chainId];
 
@@ -312,7 +314,7 @@ LockstakeEngine.LockSky.handler(async ({ event, context }) => {
   }
 });
 
-LockstakeEngine.SealFree.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealFree' }, async ({ event, context }) => {
   const amount = event.params.wad;
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
@@ -360,7 +362,7 @@ LockstakeEngine.SealFree.handler(async ({ event, context }) => {
   }
 });
 
-LockstakeEngine.FreeSky.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'FreeSky' }, async ({ event, context }) => {
   const amount = event.params.skyWad;
   const mkrSkyAddress = MKR_SKY_ADDRESSES[event.chainId];
 
@@ -422,7 +424,7 @@ LockstakeEngine.FreeSky.handler(async ({ event, context }) => {
   }
 });
 
-LockstakeEngine.SealFreeNoFee.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealFreeNoFee' }, async ({ event, context }) => {
   const amount = event.params.wad;
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
@@ -469,7 +471,7 @@ LockstakeEngine.SealFreeNoFee.handler(async ({ event, context }) => {
   }
 });
 
-LockstakeEngine.SealDraw.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealDraw' }, async ({ event, context }) => {
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
     engineAddress: event.srcAddress,
@@ -496,7 +498,7 @@ LockstakeEngine.SealDraw.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.SealWipe.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealWipe' }, async ({ event, context }) => {
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
     engineAddress: event.srcAddress,
@@ -522,7 +524,7 @@ LockstakeEngine.SealWipe.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.GetReward.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'GetReward' }, async ({ event, context }) => {
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
     engineAddress: event.srcAddress,
@@ -545,7 +547,7 @@ LockstakeEngine.GetReward.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.OnKick.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'OnKick' }, async ({ event, context }) => {
   let urn = await getSealUrn(event.params.urn, event.chainId, context);
 
   context.SealOnKick.set({
@@ -564,7 +566,7 @@ LockstakeEngine.OnKick.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.OnTake.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'OnTake' }, async ({ event, context }) => {
   let urn = await getSealUrn(event.params.urn, event.chainId, context);
 
   context.SealOnTake.set({
@@ -579,7 +581,7 @@ LockstakeEngine.OnTake.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.OnRemove.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'OnRemove' }, async ({ event, context }) => {
   let urn = await getSealUrn(event.params.urn, event.chainId, context);
 
   context.SealOnRemove.set({
@@ -598,7 +600,7 @@ LockstakeEngine.OnRemove.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.SealRely.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealRely' }, async ({ event, context }) => {
   context.SealRely.set({
     id: `${event.chainId}-${event.transaction.hash}-${event.logIndex}`,
     usr: event.params.usr,
@@ -609,7 +611,7 @@ LockstakeEngine.SealRely.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.SealDeny.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealDeny' }, async ({ event, context }) => {
   context.SealDeny.set({
     id: `${event.chainId}-${event.transaction.hash}-${event.logIndex}`,
     usr: event.params.usr,
@@ -622,7 +624,7 @@ LockstakeEngine.SealDeny.handler(async ({ event, context }) => {
 
 // SealFileAddress and SealFileUint handlers are commented out in the original
 
-LockstakeEngine.Hope.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'Hope' }, async ({ event, context }) => {
   context.SealHope.set({
     id: `${event.chainId}-${event.transaction.hash}-${event.logIndex}`,
     owner: event.params.owner,
@@ -635,7 +637,7 @@ LockstakeEngine.Hope.handler(async ({ event, context }) => {
   });
 });
 
-LockstakeEngine.Nope.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'LockstakeEngine', event: 'Nope' }, async ({ event, context }) => {
   context.SealNope.set({
     id: `${event.chainId}-${event.transaction.hash}-${event.logIndex}`,
     owner: event.params.owner,

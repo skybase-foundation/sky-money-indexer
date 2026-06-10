@@ -1,26 +1,22 @@
-import {
-  RewardsUsdsSky,
-  RewardsUsdsSpk,
-  RewardsLsmkrUsds,
-  RewardsLsskyUsds,
-  RewardsLsskySpk,
-  RewardsLsskySky,
-  RewardsUsdsClePoints,
-} from 'generated';
-import type {
-  handlerContext,
-  Reward,
-  RewardsUsdsSky_RewardPaid_event,
-  RewardsUsdsSky_Staked_event,
-  RewardsUsdsSky_Withdrawn_event,
-  RewardsUsdsSky_Referral_event,
-} from 'generated';
+import { indexer } from 'envio';
+import type { EvmOnEventContext, EvmEvent, Entity } from 'envio';
+
+type Reward = Entity<'Reward'>;
+
+type RewardsContract =
+  | 'RewardsUsdsSky'
+  | 'RewardsUsdsSpk'
+  | 'RewardsLsmkrUsds'
+  | 'RewardsLsskyUsds'
+  | 'RewardsLsskySpk'
+  | 'RewardsLsskySky'
+  | 'RewardsUsdsClePoints';
 
 // Helper: get or initialize a Reward entity
 async function getReward(
   chainId: number,
   rewardAddress: string,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<Reward> {
   const rewardId = `${chainId}-${rewardAddress}`;
   let reward = await context.Reward.get(rewardId);
@@ -43,7 +39,7 @@ async function getRewardSupplier(
   chainId: number,
   rewardId: string,
   userId: string,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ) {
   const rewardSupplierId = `${rewardId}-${userId}`;
   let supplier = await context.RewardSupplier.get(rewardSupplierId);
@@ -61,8 +57,8 @@ async function getRewardSupplier(
 
 // Handler logic: RewardPaid (RewardClaimed)
 async function handleRewardClaimed(
-  event: RewardsUsdsSky_RewardPaid_event,
-  context: handlerContext,
+  event: EvmEvent<RewardsContract, 'RewardPaid'>,
+  context: EvmOnEventContext,
 ) {
   const reward = await getReward(event.chainId, event.srcAddress, context);
 
@@ -86,8 +82,8 @@ async function handleRewardClaimed(
 
 // Handler logic: Staked (RewardSupplied)
 async function handleRewardSupplied(
-  event: RewardsUsdsSky_Staked_event,
-  context: handlerContext,
+  event: EvmEvent<RewardsContract, 'Staked'>,
+  context: EvmOnEventContext,
 ) {
   const reward = await getReward(event.chainId, event.srcAddress, context);
 
@@ -136,8 +132,8 @@ async function handleRewardSupplied(
 
 // Handler logic: Withdrawn (RewardWithdrawn)
 async function handleRewardWithdrawn(
-  event: RewardsUsdsSky_Withdrawn_event,
-  context: handlerContext,
+  event: EvmEvent<RewardsContract, 'Withdrawn'>,
+  context: EvmOnEventContext,
 ) {
   const reward = await getReward(event.chainId, event.srcAddress, context);
 
@@ -186,8 +182,8 @@ async function handleRewardWithdrawn(
 
 // Handler logic: Referral (RewardReferral)
 async function handleRewardReferral(
-  event: RewardsUsdsSky_Referral_event,
-  context: handlerContext,
+  event: EvmEvent<RewardsContract, 'Referral'>,
+  context: EvmOnEventContext,
 ) {
   const reward = await getReward(event.chainId, event.srcAddress, context);
 
@@ -208,96 +204,96 @@ async function handleRewardReferral(
 }
 
 // --- RewardsUsdsSky ---
-RewardsUsdsSky.RewardPaid.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsUsdsSky', event: 'RewardPaid' }, async ({ event, context }) => {
   await handleRewardClaimed(event, context);
 });
-RewardsUsdsSky.Staked.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsUsdsSky', event: 'Staked' }, async ({ event, context }) => {
   await handleRewardSupplied(event, context);
 });
-RewardsUsdsSky.Withdrawn.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsUsdsSky', event: 'Withdrawn' }, async ({ event, context }) => {
   await handleRewardWithdrawn(event, context);
 });
-RewardsUsdsSky.Referral.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsUsdsSky', event: 'Referral' }, async ({ event, context }) => {
   await handleRewardReferral(event, context);
 });
 
 // --- RewardsUsdsSpk ---
-RewardsUsdsSpk.RewardPaid.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsUsdsSpk', event: 'RewardPaid' }, async ({ event, context }) => {
   await handleRewardClaimed(event, context);
 });
-RewardsUsdsSpk.Staked.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsUsdsSpk', event: 'Staked' }, async ({ event, context }) => {
   await handleRewardSupplied(event, context);
 });
-RewardsUsdsSpk.Withdrawn.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsUsdsSpk', event: 'Withdrawn' }, async ({ event, context }) => {
   await handleRewardWithdrawn(event, context);
 });
-RewardsUsdsSpk.Referral.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsUsdsSpk', event: 'Referral' }, async ({ event, context }) => {
   await handleRewardReferral(event, context);
 });
 
 // --- RewardsLsmkrUsds ---
-RewardsLsmkrUsds.RewardPaid.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsmkrUsds', event: 'RewardPaid' }, async ({ event, context }) => {
   await handleRewardClaimed(event, context);
 });
-RewardsLsmkrUsds.Staked.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsmkrUsds', event: 'Staked' }, async ({ event, context }) => {
   await handleRewardSupplied(event, context);
 });
-RewardsLsmkrUsds.Withdrawn.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsmkrUsds', event: 'Withdrawn' }, async ({ event, context }) => {
   await handleRewardWithdrawn(event, context);
 });
-RewardsLsmkrUsds.Referral.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsmkrUsds', event: 'Referral' }, async ({ event, context }) => {
   await handleRewardReferral(event, context);
 });
 
 // --- RewardsLsskyUsds ---
-RewardsLsskyUsds.RewardPaid.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskyUsds', event: 'RewardPaid' }, async ({ event, context }) => {
   await handleRewardClaimed(event, context);
 });
-RewardsLsskyUsds.Staked.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskyUsds', event: 'Staked' }, async ({ event, context }) => {
   await handleRewardSupplied(event, context);
 });
-RewardsLsskyUsds.Withdrawn.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskyUsds', event: 'Withdrawn' }, async ({ event, context }) => {
   await handleRewardWithdrawn(event, context);
 });
-RewardsLsskyUsds.Referral.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskyUsds', event: 'Referral' }, async ({ event, context }) => {
   await handleRewardReferral(event, context);
 });
 
 // --- RewardsLsskySpk ---
-RewardsLsskySpk.RewardPaid.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskySpk', event: 'RewardPaid' }, async ({ event, context }) => {
   await handleRewardClaimed(event, context);
 });
-RewardsLsskySpk.Staked.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskySpk', event: 'Staked' }, async ({ event, context }) => {
   await handleRewardSupplied(event, context);
 });
-RewardsLsskySpk.Withdrawn.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskySpk', event: 'Withdrawn' }, async ({ event, context }) => {
   await handleRewardWithdrawn(event, context);
 });
-RewardsLsskySpk.Referral.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskySpk', event: 'Referral' }, async ({ event, context }) => {
   await handleRewardReferral(event, context);
 });
 
 // --- RewardsLsskySky ---
-RewardsLsskySky.RewardPaid.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskySky', event: 'RewardPaid' }, async ({ event, context }) => {
   await handleRewardClaimed(event, context);
 });
-RewardsLsskySky.Staked.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskySky', event: 'Staked' }, async ({ event, context }) => {
   await handleRewardSupplied(event, context);
 });
-RewardsLsskySky.Withdrawn.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskySky', event: 'Withdrawn' }, async ({ event, context }) => {
   await handleRewardWithdrawn(event, context);
 });
-RewardsLsskySky.Referral.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsLsskySky', event: 'Referral' }, async ({ event, context }) => {
   await handleRewardReferral(event, context);
 });
 
 // --- RewardsUsdsClePoints (no RewardPaid event) ---
-RewardsUsdsClePoints.Staked.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsUsdsClePoints', event: 'Staked' }, async ({ event, context }) => {
   await handleRewardSupplied(event, context);
 });
-RewardsUsdsClePoints.Withdrawn.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsUsdsClePoints', event: 'Withdrawn' }, async ({ event, context }) => {
   await handleRewardWithdrawn(event, context);
 });
-RewardsUsdsClePoints.Referral.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'RewardsUsdsClePoints', event: 'Referral' }, async ({ event, context }) => {
   await handleRewardReferral(event, context);
 });

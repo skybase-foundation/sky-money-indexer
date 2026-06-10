@@ -79,16 +79,15 @@ pnpm test
 ## Project Structure
 
 ```
-├── config.yaml          # Envio indexer configuration (contracts, networks, events)
+├── config.yaml          # Envio indexer configuration (contracts, chains, events)
 ├── schema.graphql       # GraphQL schema definitions
+├── envio-env.d.ts       # Wires generated types into the `envio` module
 ├── src/
 │   ├── EventHandlers.ts # Main entry point - imports all handler modules
 │   ├── helpers/         # Utility functions, constants, contract calls
 │   └── *.ts             # Event handler modules by domain
 ├── abis/                # Contract ABIs
-├── generated/           # Auto-generated code (do not edit)
-│   ├── src/             # Generated TypeScript & ReScript runtime
-│   └── docker-compose.yaml
+├── .envio/              # Auto-generated types (do not edit, gitignored)
 └── tests/
 ```
 
@@ -106,11 +105,11 @@ Add a new contract definition in `config.yaml` with the reward event signatures 
     - event: 'Withdrawn(address indexed owner, uint256 assets)'
 ```
 
-Then add the contract addresses and start blocks for each network under the `networks` section, and ensure the handler logic in `src/rewards.ts` covers the new contract.
+Then add the contract addresses and start blocks for each network under the `chains` section, and ensure the handler logic in `src/rewards.ts` covers the new contract.
 
 ## Adding a New Network
 
 To add support for a new blockchain network:
 
-1. Add a new entry under the `networks` section in `config.yaml` with the network ID, HyperSync or RPC configuration, start block, and contract addresses.
+1. Add a new entry under the `chains` section in `config.yaml` with the network ID, HyperSync or RPC configuration, start block, and contract addresses.
 2. If the network requires contract read calls, add the corresponding RPC URL environment variable to `.env`.

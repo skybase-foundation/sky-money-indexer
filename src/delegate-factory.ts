@@ -1,11 +1,14 @@
-import { DelegateFactory, BigDecimal } from 'generated';
+import { indexer, BigDecimal } from 'envio';
 
 // Register dynamic contract for VoteDelegate when CreateVoteDelegate is emitted
-DelegateFactory.CreateVoteDelegate.contractRegister(({ event, context }) => {
-  context.addVoteDelegate(event.params.voteDelegate);
-});
+indexer.contractRegister(
+  { contract: 'DelegateFactory', event: 'CreateVoteDelegate' },
+  async ({ event, context }) => {
+    context.chain.VoteDelegate.add(event.params.voteDelegate);
+  },
+);
 
-DelegateFactory.CreateVoteDelegate.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'DelegateFactory', event: 'CreateVoteDelegate' }, async ({ event, context }) => {
   // https://etherscan.io/address/0xD897F108670903D1d6070fcf818f9db3615AF272#code
   // event.params.delegate is the owner address
   const delegateOwnerAddress = event.params.delegate;

@@ -1,4 +1,4 @@
-import { Delegate, StakingEngine } from 'generated';
+import { indexer, type Entity } from 'envio';
 import { getStakingEngineUrn } from './helpers/getStakingEngineUrn';
 import {
   getDelegate,
@@ -9,7 +9,9 @@ import { getReward } from './helpers/getReward';
 import { readOwnerUrnsEffect } from './helpers/contractCalls';
 import { ZERO_ADDRESS } from './helpers/constants';
 
-StakingEngine.StakingOpen.handler(async ({ event, context }) => {
+type Delegate = Entity<'Delegate'>;
+
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingOpen' }, async ({ event, context }) => {
   let urn = await getStakingEngineUrn(event.params.urn, event.chainId, context);
 
   const updatedUrn = {
@@ -35,7 +37,7 @@ StakingEngine.StakingOpen.handler(async ({ event, context }) => {
   });
 });
 
-StakingEngine.StakingSelectVoteDelegate.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingSelectVoteDelegate' }, async ({ event, context }) => {
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
     engineAddress: event.srcAddress,
@@ -145,7 +147,7 @@ StakingEngine.StakingSelectVoteDelegate.handler(async ({ event, context }) => {
   }
 });
 
-StakingEngine.StakingSelectFarm.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingSelectFarm' }, async ({ event, context }) => {
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
     engineAddress: event.srcAddress,
@@ -175,7 +177,7 @@ StakingEngine.StakingSelectFarm.handler(async ({ event, context }) => {
   });
 });
 
-StakingEngine.StakingLock.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingLock' }, async ({ event, context }) => {
   const amount = event.params.wad;
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
@@ -224,7 +226,7 @@ StakingEngine.StakingLock.handler(async ({ event, context }) => {
   }
 });
 
-StakingEngine.StakingFree.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingFree' }, async ({ event, context }) => {
   const amount = event.params.wad;
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
@@ -271,7 +273,7 @@ StakingEngine.StakingFree.handler(async ({ event, context }) => {
   }
 });
 
-StakingEngine.StakingFreeNoFee.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingFreeNoFee' }, async ({ event, context }) => {
   const amount = event.params.wad;
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
@@ -318,7 +320,7 @@ StakingEngine.StakingFreeNoFee.handler(async ({ event, context }) => {
   }
 });
 
-StakingEngine.StakingDraw.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingDraw' }, async ({ event, context }) => {
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
     engineAddress: event.srcAddress,
@@ -345,7 +347,7 @@ StakingEngine.StakingDraw.handler(async ({ event, context }) => {
   });
 });
 
-StakingEngine.StakingWipe.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingWipe' }, async ({ event, context }) => {
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
     engineAddress: event.srcAddress,
@@ -371,7 +373,7 @@ StakingEngine.StakingWipe.handler(async ({ event, context }) => {
   });
 });
 
-StakingEngine.StakingGetReward.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingGetReward' }, async ({ event, context }) => {
   const urnAddress = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
     engineAddress: event.srcAddress,
@@ -394,7 +396,7 @@ StakingEngine.StakingGetReward.handler(async ({ event, context }) => {
   });
 });
 
-StakingEngine.StakingOnKick.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingOnKick' }, async ({ event, context }) => {
   let urn = await getStakingEngineUrn(event.params.urn, event.chainId, context);
 
   context.StakingOnKick.set({
@@ -413,7 +415,7 @@ StakingEngine.StakingOnKick.handler(async ({ event, context }) => {
   });
 });
 
-StakingEngine.StakingAddFarm.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingAddFarm' }, async ({ event, context }) => {
   let reward = await getReward(event.params.farm, event.chainId, context);
   context.Reward.set({
     ...reward,
@@ -421,7 +423,7 @@ StakingEngine.StakingAddFarm.handler(async ({ event, context }) => {
   });
 });
 
-StakingEngine.StakingDelFarm.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'StakingEngine', event: 'StakingDelFarm' }, async ({ event, context }) => {
   let reward = await getReward(event.params.farm, event.chainId, context);
   context.Reward.set({
     ...reward,

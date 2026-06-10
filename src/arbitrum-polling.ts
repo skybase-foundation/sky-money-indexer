@@ -1,11 +1,13 @@
-import { PollingEmitterArbitrum } from 'generated';
-import type { handlerContext, ArbitrumVoter } from 'generated';
+import { indexer } from 'envio';
+import type { Entity, EvmOnEventContext } from 'envio';
+
+type ArbitrumVoter = Entity<'ArbitrumVoter'>;
 
 // Helper: get or create an ArbitrumVoter entity
 async function getArbitrumVoter(
   address: string,
   chainId: number,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<ArbitrumVoter> {
   const id = `${chainId}-${address}`;
   let voter = await context.ArbitrumVoter.get(id);
@@ -22,7 +24,7 @@ async function getArbitrumVoter(
 }
 
 // Handler logic: Voted
-PollingEmitterArbitrum.Voted.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'PollingEmitterArbitrum', event: 'Voted' }, async ({ event, context }) => {
   const sender = event.params.voter;
   const pollId = `${event.chainId}-${event.params.pollId.toString()}`;
   const optionId = event.params.optionId;
@@ -77,7 +79,7 @@ PollingEmitterArbitrum.Voted.handler(async ({ event, context }) => {
 });
 
 // Handler logic: PollCreated
-PollingEmitterArbitrum.PollCreated.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'PollingEmitterArbitrum', event: 'PollCreated' }, async ({ event, context }) => {
   const creator = event.params.creator;
   const blockCreated = event.params.blockCreated;
   const pollId = `${event.chainId}-${event.params.pollId.toString()}`;
