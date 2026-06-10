@@ -1,4 +1,4 @@
-name: sky-money-indexer-tenderly
+name: sky-indexer-tenderly
 description: Sky.money multichain on-chain indexer
 unordered_multichain_mode: true
 rollback_on_reorg: true
@@ -314,6 +314,27 @@ contracts:
         field_selection:
           transaction_fields:
             - hash
+      - event: 'Cut(uint256 assets, uint256 oldChi, uint256 newChi)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  - name: Susdt
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/Susdt.json
+    events:
+      - event: 'Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdraw(address indexed sender, address indexed receiver, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
 
   # === Token Conversions ===
   - name: DaiUsds
@@ -577,6 +598,46 @@ contracts:
           transaction_fields:
             - hash
 
+  # === PSM3 (multi-chain, not deployed on Tenderly but needed for shared generated types) ===
+  - name: Psm3
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/psm/Psm3.json
+    events:
+      - event: 'Swap(address indexed assetIn, address indexed assetOut, address sender, address indexed receiver, uint256 amountIn, uint256 amountOut, uint256 referralCode)'
+        field_selection:
+          transaction_fields:
+            - hash
+
+  # === LitePSM (not deployed on Tenderly but needed for shared generated types) ===
+  - name: DssLitePsm
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/psm/DssLitePsm.json
+    events:
+      - event: 'SellGem(address indexed owner, uint256 value, uint256 fee)'
+        field_selection:
+          transaction_fields:
+            - hash
+            - from
+      - event: 'BuyGem(address indexed owner, uint256 value, uint256 fee)'
+        field_selection:
+          transaction_fields:
+            - hash
+            - from
+
+  # === Governance: Arbitrum Polling (not deployed on Tenderly but needed for shared generated types) ===
+  - name: PollingEmitterArbitrum
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/PollingEmitter.json
+    events:
+      - event: 'Voted(address indexed voter, uint256 indexed pollId, uint256 indexed optionId)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'PollCreated(address indexed creator, uint256 blockCreated, uint256 indexed pollId, uint256 startDate, uint256 endDate, string multiHash, string url)'
+        field_selection:
+          transaction_fields:
+            - hash
+
   # === Liquidations ===
   - name: McdDog
     handler: src/EventHandlers.ts
@@ -603,6 +664,12 @@ networks:
   - id: 314310
     rpc_config:
       url: https://virtual.rpc.tenderly.co/${ENVIO_TENDERLY_TESTNET_PATH}
+      initial_block_interval: 2000
+      interval_ceiling: 5000
+      backoff_multiplicative: 0.5
+      acceleration_additive: 100
+      backoff_millis: 5000
+      query_timeout_millis: 30000
     start_block: 8122207
     contracts:
       - name: DSChiefV2
@@ -653,6 +720,9 @@ networks:
       - name: Stusds
         address:
           - 0x99CD4Ec3f88A45940936F469E4bB72A2A701EEB9
+      - name: Susdt
+        address:
+          - 0x74cb54e082411cfCAEADb00a0765625B10410DAa
       - name: DaiUsds
         address:
           - 0x3225737a9Bbb6473CB4a45b7244ACa2BeFdB276A

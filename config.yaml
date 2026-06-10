@@ -333,6 +333,23 @@ contracts:
           transaction_fields:
             - hash
 
+  - name: Susdt
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/maker/Susdt.json
+    events:
+      - event: 'Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdraw(address indexed sender, address indexed receiver, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed owner, uint256 assets, uint256 shares)'
+        field_selection:
+          transaction_fields:
+            - hash
+
   # === Token Conversions ===
   - name: DaiUsds
     handler: src/EventHandlers.ts
@@ -695,6 +712,9 @@ networks:
       - name: Stusds
         address:
           - 0x99CD4Ec3f88A45940936F469E4bB72A2A701EEB9
+      - name: Susdt
+        address:
+          - 0x74cb54e082411cfCAEADb00a0765625B10410DAa
       - name: DaiUsds
         address:
           - 0x3225737a9Bbb6473CB4a45b7244ACa2BeFdB276A

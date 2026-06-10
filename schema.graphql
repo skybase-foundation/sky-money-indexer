@@ -1108,6 +1108,43 @@ type StusdsCut {
   transactionHash: String!
 }
 
+type SusdtDeposit {
+  id: ID!
+  chainId: Int! @index
+  sender: String!
+  owner: String! @index
+  assets: BigInt!
+  shares: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SusdtWithdraw {
+  id: ID!
+  chainId: Int! @index
+  sender: String!
+  receiver: String!
+  owner: String! @index
+  assets: BigInt!
+  shares: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
+type SusdtReferral {
+  id: ID!
+  chainId: Int! @index
+  referral: Int!
+  owner: String!
+  assets: BigInt!
+  shares: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+}
+
 type CurveTokenExchange {
   id: ID!
   chainId: Int! @index
