@@ -1,10 +1,12 @@
-import type { handlerContext, StakingUrn } from 'generated';
+import type { EvmOnEventContext, Entity } from 'envio';
 import { ZERO_ADDRESS } from './constants';
+
+type StakingUrn = Entity<'StakingUrn'>;
 
 export async function getStakingEngineUrn(
   urnAddress: string,
   chainId: number,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<StakingUrn> {
   const id = `${chainId}-${urnAddress}`;
   let urn = await context.StakingUrn.get(id);

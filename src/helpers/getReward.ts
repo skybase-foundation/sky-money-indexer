@@ -1,9 +1,11 @@
-import type { handlerContext, Reward } from 'generated';
+import type { EvmOnEventContext, Entity } from 'envio';
+
+type Reward = Entity<'Reward'>;
 
 export async function getReward(
   rewardAddress: string,
   chainId: number,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<Reward> {
   const id = `${chainId}-${rewardAddress}`;
   let reward = await context.Reward.get(id);

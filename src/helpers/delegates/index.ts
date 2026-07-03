@@ -1,9 +1,8 @@
-import type {
-  delegate as Delegate,
-  delegation as Delegation,
-  handlerContext,
-} from 'generated';
+import type { Entity, EvmOnEventContext } from 'envio';
 import { shouldIgnoreDelegator } from '../constants';
+
+type Delegate = Entity<'Delegate'>;
+type Delegation = Entity<'Delegation'>;
 
 export async function delegationLockHandler(
   delegate: Delegate,
@@ -16,7 +15,7 @@ export async function delegationLockHandler(
   isStakingEngine: boolean,
   logIndex: string,
   chainId: number,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<void> {
   const { delegation, updatedDelegate: delegateWithDelegation } =
     await getDelegation(delegate, address, blockTimestamp, chainId, context);
@@ -80,7 +79,7 @@ export async function delegationFreeHandler(
   isStakingEngine: boolean,
   logIndex: string,
   chainId: number,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<void> {
   const { delegation, updatedDelegate: delegateWithDelegation } =
     await getDelegation(delegate, address, blockTimestamp, chainId, context);
@@ -140,7 +139,7 @@ export async function getDelegation(
   address: string,
   blockTimestamp: bigint,
   chainId: number,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<{ delegation: Delegation; updatedDelegate: Delegate }> {
   const delegationId = delegate.id + '-' + address;
   let delegation = await context.Delegation.get(delegationId);
@@ -161,7 +160,7 @@ export async function getDelegation(
 export async function getDelegate(
   delegateAddress: string | null | undefined,
   chainId: number,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<Delegate | null> {
   if (!delegateAddress) {
     return null;

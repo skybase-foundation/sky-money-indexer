@@ -1,5 +1,5 @@
-import { DSChiefV2 } from 'generated';
-import type { handlerContext, DSChiefV2_Vote_event } from 'generated';
+import { indexer } from 'envio';
+import type { EvmEvent, EvmOnEventContext } from 'envio';
 import { SpellState } from './helpers/constants';
 import {
   addWeightToSpellsV2,
@@ -10,7 +10,7 @@ import {
   toDecimal,
 } from './helpers/helpers';
 
-DSChiefV2.Lock.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'DSChiefV2', event: 'Lock' }, async ({ event, context }) => {
   const sender = event.params.usr;
   const amount = event.params.wad;
 
@@ -38,7 +38,7 @@ DSChiefV2.Lock.handler(async ({ event, context }) => {
   await addWeightToSpellsV2(voter.currentSpellsV2, amount, context);
 });
 
-DSChiefV2.Free.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'DSChiefV2', event: 'Free' }, async ({ event, context }) => {
   const sender = event.params.usr;
   const amount = event.params.wad;
 
@@ -66,7 +66,7 @@ DSChiefV2.Free.handler(async ({ event, context }) => {
   await removeWeightFromSpellsV2(voter.currentSpellsV2, amount, context);
 });
 
-DSChiefV2.Vote.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'DSChiefV2', event: 'Vote' }, async ({ event, context }) => {
   const sender = event.params.usr;
   const slateId = event.params.slate;
   await _handleSlateVote(sender, slateId, event, context);
@@ -75,8 +75,8 @@ DSChiefV2.Vote.handler(async ({ event, context }) => {
 async function _handleSlateVote(
   sender: string,
   slateId: string,
-  event: DSChiefV2_Vote_event,
-  context: handlerContext,
+  event: EvmEvent<'DSChiefV2', 'Vote'>,
+  context: EvmOnEventContext,
 ): Promise<void> {
   const voter = await getVoter(sender, event.chainId, context);
   let slate = await context.SlateV2.get(`${event.chainId}-${slateId}`);
@@ -125,7 +125,7 @@ async function _handleSlateVote(
   });
 }
 
-DSChiefV2.Lift.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'DSChiefV2', event: 'Lift' }, async ({ event, context }) => {
   const spellId = `${event.chainId}-${event.params.whom}`;
 
   const spell = await context.SpellV2.get(spellId);

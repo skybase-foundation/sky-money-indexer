@@ -1,6 +1,6 @@
-import { SavingsUsds } from 'generated';
+import { indexer } from 'envio';
 
-SavingsUsds.Deposit.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'SavingsUsds', event: 'Deposit' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.SavingsSupply.set({
@@ -24,7 +24,7 @@ SavingsUsds.Deposit.handler(async ({ event, context }) => {
   }
 });
 
-SavingsUsds.Withdraw.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'SavingsUsds', event: 'Withdraw' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.SavingsWithdraw.set({
@@ -41,7 +41,7 @@ SavingsUsds.Withdraw.handler(async ({ event, context }) => {
   });
 });
 
-SavingsUsds.Referral.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'SavingsUsds', event: 'Referral' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   const ref = Number(event.params.referral) || 0;

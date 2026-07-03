@@ -1,7 +1,7 @@
-import { CurveUsdsStUsdsPool } from 'generated';
+import { indexer } from 'envio';
 import { readCurvePoolCoinEffect } from './helpers/contractCalls';
 
-CurveUsdsStUsdsPool.TokenExchange.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'CurveUsdsStUsdsPool', event: 'TokenExchange' }, async ({ event, context }) => {
   const entityId = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   // Kick off both contract calls in parallel at the top of the handler

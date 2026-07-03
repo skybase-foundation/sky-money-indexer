@@ -1,18 +1,14 @@
-import { BigDecimal } from 'generated';
-import type {
-  handlerContext,
-  Voter,
-  SlateV2,
-  DSChiefV2_Lock_event,
-  DSChiefV2_Free_event,
-  DSChiefV2_Vote_event,
-} from 'generated';
+import { BigDecimal } from 'envio';
+import type { Entity, EvmEvent, EvmOnEventContext } from 'envio';
 import {
   readDSChiefSlateEffect,
   readSpellDescriptionEffect,
   readSpellExpirationEffect,
 } from './contractCalls';
 import { SpellState, ZERO_ADDRESS } from './constants';
+
+type Voter = Entity<'Voter'>;
+type SlateV2 = Entity<'SlateV2'>;
 
 export function toDecimal(value: bigint, decimals: number = 18): BigDecimal {
   const divisor = new BigDecimal(10).pow(decimals);
@@ -22,7 +18,7 @@ export function toDecimal(value: bigint, decimals: number = 18): BigDecimal {
 export async function getVoter(
   address: string,
   chainId: number,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<Voter> {
   const id = `${chainId}-${address}`;
   let voter = await context.Voter.get(id);
@@ -47,7 +43,7 @@ export async function getVoter(
 }
 
 export function createExecutiveVotingPowerChangeV2(
-  event: DSChiefV2_Lock_event | DSChiefV2_Free_event,
+  event: EvmEvent<'DSChiefV2', 'Lock'> | EvmEvent<'DSChiefV2', 'Free'>,
   amount: bigint,
   previousBalance: bigint,
   newBalance: bigint,
@@ -71,8 +67,8 @@ export function createExecutiveVotingPowerChangeV2(
 
 export async function createSlateV2(
   slateID: string,
-  event: DSChiefV2_Vote_event,
-  context: handlerContext,
+  event: EvmEvent<'DSChiefV2', 'Vote'>,
+  context: EvmOnEventContext,
 ): Promise<SlateV2> {
   const yays: string[] = [];
   const chiefAddress = event.srcAddress;
@@ -104,7 +100,7 @@ export async function createSlateV2(
         ]);
         // Only save the spell if expiration() didn't revert
         // (matches original subgraph behavior)
-        if (expiryTime !== undefined) {
+        if (expiryTime !== null) {
           spell = {
             id: spellId,
             chainId,
@@ -149,9 +145,9 @@ export async function createSlateV2(
 }
 
 export async function addWeightToSpellsV2(
-  spellIDs: string[],
+  spellIDs: readonly string[],
   weight: bigint,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<void> {
   for (let i = 0; i < spellIDs.length; i++) {
     const spell = await context.SpellV2.get(spellIDs[i]);
@@ -165,9 +161,9 @@ export async function addWeightToSpellsV2(
 }
 
 export async function removeWeightFromSpellsV2(
-  spellIDs: string[],
+  spellIDs: readonly string[],
   weight: bigint,
-  context: handlerContext,
+  context: EvmOnEventContext,
 ): Promise<void> {
   for (let i = 0; i < spellIDs.length; i++) {
     const spell = await context.SpellV2.get(spellIDs[i]);

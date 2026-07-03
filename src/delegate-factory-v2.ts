@@ -1,11 +1,14 @@
-import { DelegateFactoryV2, BigDecimal } from 'generated';
+import { indexer, BigDecimal } from 'envio';
 
 // Register dynamic contract for VoteDelegateV2 when CreateVoteDelegate is emitted
-DelegateFactoryV2.CreateVoteDelegate.contractRegister(({ event, context }) => {
-  context.addVoteDelegateV2(event.params.voteDelegate);
-});
+indexer.contractRegister(
+  { contract: 'DelegateFactoryV2', event: 'CreateVoteDelegate' },
+  async ({ event, context }) => {
+    context.chain.VoteDelegateV2.add(event.params.voteDelegate);
+  },
+);
 
-DelegateFactoryV2.CreateVoteDelegate.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'DelegateFactoryV2', event: 'CreateVoteDelegate' }, async ({ event, context }) => {
   const delegateOwnerAddress = event.params.usr;
   const delegateContractAddress = event.params.voteDelegate;
 

@@ -1,8 +1,6 @@
 name: sky-indexer-tenderly
 description: Sky.money multichain on-chain indexer
-unordered_multichain_mode: true
 rollback_on_reorg: true
-preload_handlers: true
 address_format: lowercase
 schema: schema.graphql
 contracts:
@@ -659,17 +657,18 @@ contracts:
             - hash
 
 # === Network Configuration ===
-networks:
+chains:
   # Tenderly Testnet (RPC fallback)
   - id: 314310
-    rpc_config:
-      url: https://virtual.rpc.tenderly.co/${ENVIO_TENDERLY_TESTNET_PATH}
-      initial_block_interval: 2000
-      interval_ceiling: 5000
-      backoff_multiplicative: 0.5
-      acceleration_additive: 100
-      backoff_millis: 5000
-      query_timeout_millis: 30000
+    rpc:
+      - url: https://virtual.rpc.tenderly.co/${ENVIO_TENDERLY_TESTNET_PATH}
+        for: sync
+        initial_block_interval: 2000
+        interval_ceiling: 5000
+        backoff_multiplicative: 0.5
+        acceleration_additive: 100
+        backoff_millis: 5000
+        query_timeout_millis: 30000
     start_block: 8122207
     contracts:
       - name: DSChiefV2

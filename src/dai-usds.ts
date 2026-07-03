@@ -1,6 +1,6 @@
-import { DaiUsds } from 'generated';
+import { indexer } from 'envio';
 
-DaiUsds.DaiToUsds.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'DaiUsds', event: 'DaiToUsds' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.DaiToUsdsUpgrade.set({
@@ -23,7 +23,7 @@ DaiUsds.DaiToUsds.handler(async ({ event, context }) => {
   context.Total.set({ ...total, total: total.total + event.params.wad });
 });
 
-DaiUsds.UsdsToDai.handler(async ({ event, context }) => {
+indexer.onEvent({ contract: 'DaiUsds', event: 'UsdsToDai' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;
 
   context.UsdsToDaiRevert.set({
