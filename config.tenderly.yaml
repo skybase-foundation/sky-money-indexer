@@ -278,6 +278,27 @@ contracts:
           transaction_fields:
             - hash
 
+  - name: RewardsUsdsGrove
+    handler: src/EventHandlers.ts
+    abi_file_path: abis/rewards/RewardsUsdsGrove.json
+    events:
+      - event: 'RewardPaid(address indexed user, uint256 reward)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Staked(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Withdrawn(address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: 'Referral(uint16 indexed referral, address indexed user, uint256 amount)'
+        field_selection:
+          transaction_fields:
+            - hash
+
   # === Savings & Staking ===
   - name: SavingsUsds
     handler: src/EventHandlers.ts
@@ -661,7 +682,7 @@ chains:
   # Tenderly Testnet (RPC fallback)
   - id: 314310
     rpc:
-      - url: https://virtual.rpc.tenderly.co/${ENVIO_TENDERLY_TESTNET_PATH}
+      - url: https://virtual.mainnet.eu.rpc.tenderly.co/${ENVIO_TENDERLY_TESTNET_PATH}
         for: sync
         initial_block_interval: 2000
         interval_ceiling: 5000
@@ -713,6 +734,9 @@ chains:
       - name: RewardsLsskySky
         address:
           - 0xB44C2Fb4181D7Cb06bdFf34A46FdFe4a259B40Fc
+      - name: RewardsUsdsGrove
+        address:
+          - 0x4E41488C19cD35EB4de3083Fc3e204854c75c86a
       - name: SavingsUsds
         address:
           - 0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD

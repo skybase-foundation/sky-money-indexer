@@ -76,7 +76,7 @@ const curveCoinsAbi = [
 const RPC_URLS: Record<number, string> = {
   1: process.env.ENVIO_MAINNET_RPC_URL || '',
   314310:
-    `https://virtual.rpc.tenderly.co/${process.env.ENVIO_TENDERLY_TESTNET_PATH}` ||
+    `https://virtual.mainnet.eu.rpc.tenderly.co/${process.env.ENVIO_TENDERLY_TESTNET_PATH}` ||
     '',
 };
 
