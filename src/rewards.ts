@@ -10,6 +10,7 @@ type RewardsContract =
   | 'RewardsLsskyUsds'
   | 'RewardsLsskySpk'
   | 'RewardsLsskySky'
+  | 'RewardsUsdsGrove'
   | 'RewardsUsdsClePoints';
 
 // Helper: get or initialize a Reward entity
@@ -284,6 +285,20 @@ indexer.onEvent({ contract: 'RewardsLsskySky', event: 'Withdrawn' }, async ({ ev
   await handleRewardWithdrawn(event, context);
 });
 indexer.onEvent({ contract: 'RewardsLsskySky', event: 'Referral' }, async ({ event, context }) => {
+  await handleRewardReferral(event, context);
+});
+
+// --- RewardsUsdsGrove ---
+indexer.onEvent({ contract: 'RewardsUsdsGrove', event: 'RewardPaid' }, async ({ event, context }) => {
+  await handleRewardClaimed(event, context);
+});
+indexer.onEvent({ contract: 'RewardsUsdsGrove', event: 'Staked' }, async ({ event, context }) => {
+  await handleRewardSupplied(event, context);
+});
+indexer.onEvent({ contract: 'RewardsUsdsGrove', event: 'Withdrawn' }, async ({ event, context }) => {
+  await handleRewardWithdrawn(event, context);
+});
+indexer.onEvent({ contract: 'RewardsUsdsGrove', event: 'Referral' }, async ({ event, context }) => {
   await handleRewardReferral(event, context);
 });
 
