@@ -1,4 +1,4 @@
-import { indexer } from 'envio';
+import { indexer } from "envio";
 import { readCurvePoolCoinEffect } from './helpers/contractCalls';
 
 indexer.onEvent({ contract: 'CurveUsdsStUsdsPool', event: 'TokenExchange' }, async ({ event, context }) => {

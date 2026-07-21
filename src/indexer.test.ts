@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTestIndexer } from 'envio';
+import { createTestIndexer } from "envio";
 import './EventHandlers';
 
 const CALLER = '0x1111111111111111111111111111111111111111';

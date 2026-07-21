@@ -1,4 +1,4 @@
-import { indexer } from 'envio';
+import { indexer } from "envio";
 
 indexer.onEvent({ contract: 'Psm3', event: 'Swap' }, async ({ event, context }) => {
   const id = `${event.chainId}-${event.transaction.hash}-${event.logIndex}`;

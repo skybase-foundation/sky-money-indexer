@@ -1,5 +1,5 @@
-import { indexer } from 'envio';
-import type { EvmOnEventContext, EvmEvent, Entity } from 'envio';
+import { indexer } from "envio";
+import type { EvmOnEventContext, EvmEvent, Entity } from "envio";
 
 type Reward = Entity<'Reward'>;
 
