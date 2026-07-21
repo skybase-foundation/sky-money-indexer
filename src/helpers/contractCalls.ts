@@ -6,7 +6,7 @@ import {
 } from 'viem';
 import { mainnet } from 'viem/chains';
 import type { Chain } from 'viem';
-import { createEffect, S } from 'envio';
+import { createEffect, S } from "envio";
 
 // ABI fragments for the contract calls we need
 const dsChiefSlatesAbi = [

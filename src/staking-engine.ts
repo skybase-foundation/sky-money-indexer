@@ -1,4 +1,4 @@
-import { indexer, type Entity } from 'envio';
+import { indexer, type Entity } from "envio";
 import { getStakingEngineUrn } from './helpers/getStakingEngineUrn';
 import {
   getDelegate,

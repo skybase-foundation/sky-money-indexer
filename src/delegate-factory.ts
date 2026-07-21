@@ -1,4 +1,4 @@
-import { indexer, BigDecimal } from 'envio';
+import { indexer, BigDecimal } from "envio";
 
 // Register dynamic contract for VoteDelegate when CreateVoteDelegate is emitted
 indexer.contractRegister(

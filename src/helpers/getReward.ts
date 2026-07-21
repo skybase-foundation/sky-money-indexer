@@ -1,4 +1,4 @@
-import type { EvmOnEventContext, Entity } from 'envio';
+import type { EvmOnEventContext, Entity } from "envio";
 
 type Reward = Entity<'Reward'>;
 
