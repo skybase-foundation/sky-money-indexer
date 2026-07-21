@@ -1,5 +1,5 @@
-import { indexer } from 'envio';
-import type { EvmEvent, EvmOnEventContext } from 'envio';
+import { indexer } from "envio";
+import type { EvmEvent, EvmOnEventContext } from "envio";
 import { getVoter } from './helpers/helpers';
 
 // Helper: create a default Poll entity with all required fields

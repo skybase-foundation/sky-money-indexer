@@ -1,5 +1,5 @@
-import { indexer } from 'envio';
-import type { Entity, EvmOnEventContext } from 'envio';
+import { indexer } from "envio";
+import type { Entity, EvmOnEventContext } from "envio";
 
 type ArbitrumVoter = Entity<'ArbitrumVoter'>;
 

@@ -1,4 +1,4 @@
-import { indexer } from 'envio';
+import { indexer } from "envio";
 
 indexer.onEvent({ contract: 'McdDog', event: 'Bark' }, async ({ event, context }) => {
   const barkId = `${event.chainId}-${event.params.ilk}-${event.params.id}`;
