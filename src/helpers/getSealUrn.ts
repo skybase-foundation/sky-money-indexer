@@ -1,4 +1,4 @@
-import type { EvmOnEventContext, Entity } from 'envio';
+import type { EvmOnEventContext, Entity } from "envio";
 import { ZERO_ADDRESS } from './constants';
 
 type SealUrn = Entity<'SealUrn'>;

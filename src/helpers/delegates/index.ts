@@ -1,4 +1,4 @@
-import type { Entity, EvmOnEventContext } from 'envio';
+import type { Entity, EvmOnEventContext } from "envio";
 import { shouldIgnoreDelegator } from '../constants';
 
 type Delegate = Entity<'Delegate'>;

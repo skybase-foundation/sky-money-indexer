@@ -1,5 +1,5 @@
-import { indexer } from 'envio';
-import type { EvmEvent, EvmOnEventContext } from 'envio';
+import { indexer } from "envio";
+import type { EvmEvent, EvmOnEventContext } from "envio";
 import { SpellState } from './helpers/constants';
 import {
   addWeightToSpellsV2,
