@@ -1,3 +1,4 @@
+import { indexer } from "envio";
 /**
  * Main entry point for all Envio/HyperIndex event handlers.
  *

@@ -1,4 +1,4 @@
-import { indexer } from 'envio';
+import { indexer } from "envio";
 import { shouldIgnoreDelegator } from './helpers/constants';
 
 indexer.onEvent({ contract: 'VoteDelegateV2', event: 'Lock' }, async ({ event, context }) => {

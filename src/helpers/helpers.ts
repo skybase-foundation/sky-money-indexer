@@ -1,5 +1,5 @@
-import { BigDecimal } from 'envio';
-import type { Entity, EvmEvent, EvmOnEventContext } from 'envio';
+import { BigDecimal } from "envio";
+import type { Entity, EvmEvent, EvmOnEventContext } from "envio";
 import {
   readDSChiefSlateEffect,
   readSpellDescriptionEffect,

@@ -1,4 +1,4 @@
-import { indexer, type Entity } from 'envio';
+import { indexer, type Entity } from "envio";
 import { getSealUrn } from './helpers/getSealUrn';
 import {
   getDelegate,
