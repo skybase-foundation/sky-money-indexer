@@ -17,7 +17,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "envio": "^3.0.2",
+    "envio": "^3.2.1",
     "viem": "^2.46.2"
   },
   "devDependencies": {
