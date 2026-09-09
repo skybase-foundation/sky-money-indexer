@@ -7,6 +7,7 @@ import {
 import { mainnet } from 'viem/chains';
 import type { Chain } from 'viem';
 import { createEffect, S } from 'envio';
+import { ZERO_ADDRESS } from './constants';
 
 // ABI fragments for the contract calls we need
 const dsChiefSlatesAbi = [
@@ -114,14 +115,22 @@ function getClient(chainId: number): PublicClient {
 
 // === Effects ===
 
+// Fallback only: urns are normally resolved from the UrnOwnerIndex entity
+// persisted on Open (see src/helpers/resolveUrn.ts). The call is pinned to the
+// event's block so a lagging RPC node can never answer for a not-yet-mined
+// urn, and a zero-address result is treated as an error (thrown, hence not
+// cached) so Envio retries instead of persisting a phantom urn.
+// The effect name is versioned so caches written by the old unpinned
+// `readOwnerUrns` effect can never be reused.
 export const readOwnerUrnsEffect = createEffect(
   {
-    name: 'readOwnerUrns',
+    name: 'readOwnerUrnsAtBlock',
     input: {
       chainId: S.int32,
       engineAddress: S.string,
       owner: S.string,
       index: S.bigint,
+      blockNumber: S.bigint,
     },
     output: S.string,
     rateLimit: { calls: 10, per: 'second' as const },
@@ -135,13 +144,21 @@ export const readOwnerUrnsEffect = createEffect(
         abi: ownerUrnsAbi,
         functionName: 'ownerUrns',
         args: [input.owner as Address, input.index],
+        blockNumber: input.blockNumber,
       });
-      return (result as string).toLowerCase();
+      const urn = (result as string).toLowerCase();
+      if (urn === ZERO_ADDRESS) {
+        throw new Error(
+          `ownerUrns(${input.owner}, ${input.index.toString()}) returned the zero address at block ${input.blockNumber.toString()}`,
+        );
+      }
+      return urn;
     } catch (error) {
       context.log.error('Failed to read ownerUrns', {
         engineAddress: input.engineAddress,
         owner: input.owner,
         index: input.index.toString(),
+        blockNumber: input.blockNumber.toString(),
         chainId: input.chainId.toString(),
         err: error,
       });

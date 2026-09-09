@@ -8,6 +8,11 @@ export async function getStakingEngineUrn(
   chainId: number,
   context: EvmOnEventContext,
 ): Promise<StakingUrn> {
+  if (!urnAddress || urnAddress === ZERO_ADDRESS) {
+    // A zero urn address means the (owner, index) -> urn resolution failed.
+    // Throw so Envio retries the batch instead of persisting a phantom urn.
+    throw new Error(`Refusing to load urn with zero address on chain ${chainId}`);
+  }
   const id = `${chainId}-${urnAddress}`;
   let urn = await context.StakingUrn.get(id);
   if (!urn) {
