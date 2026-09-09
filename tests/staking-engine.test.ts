@@ -1,8 +1,12 @@
 import { describe, it } from 'vitest';
 import { createTestIndexer } from 'envio';
+import { getStakingEngineUrn } from '../src/helpers/getStakingEngineUrn';
+import { getSealUrn } from '../src/helpers/getSealUrn';
+import { resolveUrnAddress } from '../src/helpers/resolveUrn';
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-const STAKING_ENGINE = '0xCe01C90dE7FD1bcFa39e237FE6D8D9F569e8A6a3';
+// config.yaml sets address_format: lowercase, so event.srcAddress is lowercased
+const STAKING_ENGINE = '0xce01c90de7fd1bcfa39e237fe6d8d9f569e8a6a3';
 
 // Shape of prod tx 0xcb2d00a7d5e706eeac00b3f89cc211f3a32dc428126f747849af449e98e6c608:
 // Open + Lock + SelectFarm for a new urn, all in one multicall transaction.
@@ -76,30 +80,52 @@ describe('StakingEngine urn resolution', () => {
     t.expect(lookup.urn).toBe(URN);
   });
 
-  it('refuses to create a StakingUrn for the zero address', async (t) => {
-    const indexer = createTestIndexer();
+  it('refuses to load a StakingUrn or SealUrn for the zero address', async (t) => {
+    const context = { StakingUrn: { get: async () => undefined }, SealUrn: { get: async () => undefined } } as any;
+    await t.expect(getStakingEngineUrn(ZERO_ADDRESS, 1, context)).rejects.toThrow(/zero address/);
+    await t.expect(getSealUrn(ZERO_ADDRESS, 1, context)).rejects.toThrow(/zero address/);
+  });
 
-    // Lock without a prior Open and without a lookup entity: resolution must
-    // fall back to RPC (pinned to the block) or fail, never silently create
-    // a "1-0x000...000" urn.
-    const run = indexer.process({
-      chains: {
-        1: {
-          simulate: [
-            {
-              contract: 'StakingEngine',
-              event: 'StakingLock',
-              srcAddress: STAKING_ENGINE,
-              block: { number: BLOCK },
-              transaction: { hash: TX_HASH },
-              params: { owner: OWNER, index: 999n, wad: WAD, ref: 0 },
-            },
-          ],
-        },
+  it('never resolves the zero address from the RPC fallback', async (t) => {
+    const event = {
+      chainId: 1,
+      srcAddress: STAKING_ENGINE,
+      block: { number: BLOCK },
+      params: { owner: OWNER, index: 999n },
+    };
+    const effectCalls: unknown[] = [];
+    const context = {
+      isPreload: false,
+      UrnOwnerIndex: { get: async () => undefined },
+      effect: async (_effect: unknown, input: unknown) => {
+        effectCalls.push(input);
+        // Effect must throw on a zero result; emulate a misbehaving one anyway.
+        return ZERO_ADDRESS;
       },
-    });
+    } as any;
+    await t.expect(resolveUrnAddress(event, context)).rejects.toThrow(/Could not resolve urn/);
+    t.expect(effectCalls).toEqual([
+      { chainId: 1, engineAddress: STAKING_ENGINE, owner: OWNER, index: 999n, blockNumber: BigInt(BLOCK) },
+    ]);
+  });
 
-    await t.expect(run).rejects.toThrow();
-    t.expect(await indexer.StakingUrn.get(`1-${ZERO_ADDRESS}`)).toBeUndefined();
+  it('does not hit the RPC fallback during the preload pass', async (t) => {
+    const event = {
+      chainId: 1,
+      srcAddress: STAKING_ENGINE,
+      block: { number: BLOCK },
+      params: { owner: OWNER, index: INDEX },
+    };
+    let effectCalled = false;
+    const context = {
+      isPreload: true,
+      UrnOwnerIndex: { get: async () => undefined },
+      effect: async () => {
+        effectCalled = true;
+        return URN;
+      },
+    } as any;
+    await t.expect(resolveUrnAddress(event, context)).rejects.toThrow(/preload/);
+    t.expect(effectCalled).toBe(false);
   });
 });

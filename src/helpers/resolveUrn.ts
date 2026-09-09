@@ -58,6 +58,14 @@ export async function resolveUrnAddress(
     return lookup.urn;
   }
 
+  // During the preload pass an Open in the same batch has not been applied
+  // yet, so a missing lookup is expected. Throwing here is silently ignored
+  // by Envio and the handler re-runs in the sequential pass, where the lookup
+  // exists. This avoids a pointless RPC round-trip per event.
+  if (context.isPreload) {
+    throw new Error('urn lookup not available during preload');
+  }
+
   const urn = await context.effect(readOwnerUrnsEffect, {
     chainId: event.chainId,
     engineAddress: event.srcAddress,

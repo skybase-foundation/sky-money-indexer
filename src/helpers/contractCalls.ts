@@ -73,13 +73,15 @@ const curveCoinsAbi = [
   },
 ] as const;
 
-// RPC URLs per chain
-const RPC_URLS: Record<number, string> = {
-  1: process.env.ENVIO_MAINNET_RPC_URL || '',
-  314310:
-    `https://virtual.mainnet.eu.rpc.tenderly.co/${process.env.ENVIO_TENDERLY_TESTNET_PATH}` ||
-    '',
-};
+// RPC URLs per chain. Only chains with a configured URL get a client; an
+// empty URL would make viem silently fall back to the chain's public RPC.
+const RPC_URLS: Record<number, string> = {};
+if (process.env.ENVIO_MAINNET_RPC_URL) {
+  RPC_URLS[1] = process.env.ENVIO_MAINNET_RPC_URL;
+}
+if (process.env.ENVIO_TENDERLY_TESTNET_PATH) {
+  RPC_URLS[314310] = `https://virtual.mainnet.eu.rpc.tenderly.co/${process.env.ENVIO_TENDERLY_TESTNET_PATH}`;
+}
 
 // Tenderly fork inherits mainnet config but with its own chain ID
 const tenderly: Chain = {
