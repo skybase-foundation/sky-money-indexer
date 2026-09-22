@@ -17,6 +17,11 @@ export async function delegationLockHandler(
   chainId: number,
   context: EvmOnEventContext,
 ): Promise<void> {
+  // a zero-wad lock changes nothing, but would still re-arm the delegators guard
+  if (amount === 0n) {
+    return;
+  }
+
   const { delegation, updatedDelegate: delegateWithDelegation } =
     await getDelegation(delegate, address, blockTimestamp, chainId, context);
 
@@ -24,17 +29,16 @@ export async function delegationLockHandler(
     return;
   }
 
-  // If previous delegation amount was 0, increment the delegators count
+  const previousAmount = delegation.amount;
+  const newAmount = previousAmount + amount;
+
   let updatedDelegate = { ...delegateWithDelegation };
-  if (delegation.amount === 0n) {
+  if (previousAmount === 0n && newAmount > 0n) {
     updatedDelegate = {
       ...updatedDelegate,
       delegators: updatedDelegate.delegators + 1,
     };
   }
-
-  // Increase the total amount delegated to the delegate
-  const newAmount = delegation.amount + amount;
 
   // Create a new delegation history entity
   const delegationHistoryId =
@@ -81,6 +85,11 @@ export async function delegationFreeHandler(
   chainId: number,
   context: EvmOnEventContext,
 ): Promise<void> {
+  // a zero-wad free changes nothing, but would still re-arm the delegators guard
+  if (amount === 0n) {
+    return;
+  }
+
   const { delegation, updatedDelegate: delegateWithDelegation } =
     await getDelegation(delegate, address, blockTimestamp, chainId, context);
 
@@ -88,13 +97,12 @@ export async function delegationFreeHandler(
     return;
   }
 
-  // Decrease the total amount delegated to the delegate
-  const newAmount = delegation.amount - amount;
+  const previousAmount = delegation.amount;
+  const newAmount = previousAmount - amount;
 
   let updatedDelegate = { ...delegateWithDelegation };
 
-  // If the delegation amount is 0, decrement the delegators count
-  if (newAmount === 0n) {
+  if (previousAmount > 0n && newAmount === 0n) {
     updatedDelegate = {
       ...updatedDelegate,
       delegators: updatedDelegate.delegators - 1,

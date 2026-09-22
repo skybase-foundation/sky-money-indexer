@@ -59,25 +59,54 @@ describe('DelegateFactory', () => {
   });
 });
 
-describe('VoteDelegateV3 delegator count', () => {
+const DELEGATORS = [
+  '0x5555555555555555555555555555555555555555',
+  '0x6666666666666666666666666666666666666666',
+  '0x7777777777777777777777777777777777777777',
+] as const;
+type Delegator = (typeof DELEGATORS)[number];
+
+const VERSIONS = [
+  {
+    version: 'VoteDelegate',
+    createDelegate: {
+      contract: 'DelegateFactory',
+      event: 'CreateVoteDelegate',
+      params: { delegate: DELEGATE_OWNER, voteDelegate: DELEGATE_CONTRACT },
+    },
+    lock: (usr: Delegator, wad: bigint) =>
+      ({ contract: 'VoteDelegate', event: 'Lock', srcAddress: DELEGATE_CONTRACT, params: { usr, wad } }) as const,
+    free: (usr: Delegator, wad: bigint) =>
+      ({ contract: 'VoteDelegate', event: 'Free', srcAddress: DELEGATE_CONTRACT, params: { usr, wad } }) as const,
+  },
+  {
+    version: 'VoteDelegateV2',
+    createDelegate: {
+      contract: 'DelegateFactoryV2',
+      event: 'CreateVoteDelegate',
+      params: { usr: DELEGATE_OWNER, voteDelegate: DELEGATE_CONTRACT },
+    },
+    lock: (usr: Delegator, wad: bigint) =>
+      ({ contract: 'VoteDelegateV2', event: 'Lock', srcAddress: DELEGATE_CONTRACT, params: { usr, wad } }) as const,
+    free: (usr: Delegator, wad: bigint) =>
+      ({ contract: 'VoteDelegateV2', event: 'Free', srcAddress: DELEGATE_CONTRACT, params: { usr, wad } }) as const,
+  },
+  {
+    version: 'VoteDelegateV3',
+    createDelegate: {
+      contract: 'DelegateFactoryV3',
+      event: 'CreateVoteDelegate',
+      params: { usr: DELEGATE_OWNER, voteDelegate: DELEGATE_CONTRACT },
+    },
+    lock: (usr: Delegator, wad: bigint) =>
+      ({ contract: 'VoteDelegateV3', event: 'Lock', srcAddress: DELEGATE_CONTRACT, params: { usr, wad } }) as const,
+    free: (usr: Delegator, wad: bigint) =>
+      ({ contract: 'VoteDelegateV3', event: 'Free', srcAddress: DELEGATE_CONTRACT, params: { usr, wad } }) as const,
+  },
+] as const;
+
+describe.each(VERSIONS)('$version delegator count', ({ createDelegate, lock, free }) => {
   const DELEGATE_ID = `1-${DELEGATE_CONTRACT}`;
-  const DELEGATORS = [
-    '0x5555555555555555555555555555555555555555',
-    '0x6666666666666666666666666666666666666666',
-    '0x7777777777777777777777777777777777777777',
-  ] as const;
-  type Address = (typeof DELEGATORS)[number];
-
-  const createDelegate = {
-    contract: 'DelegateFactoryV3',
-    event: 'CreateVoteDelegate',
-    params: { usr: DELEGATE_OWNER, voteDelegate: DELEGATE_CONTRACT },
-  } as const;
-
-  const lock = (usr: Address, wad: bigint) =>
-    ({ contract: 'VoteDelegateV3', event: 'Lock', srcAddress: DELEGATE_CONTRACT, params: { usr, wad } }) as const;
-  const free = (usr: Address, wad: bigint) =>
-    ({ contract: 'VoteDelegateV3', event: 'Free', srcAddress: DELEGATE_CONTRACT, params: { usr, wad } }) as const;
 
   const expectCountMatchesPositiveRows = async (indexer: ReturnType<typeof createTestIndexer>) => {
     const delegate = await indexer.Delegate.getOrThrow(DELEGATE_ID);
