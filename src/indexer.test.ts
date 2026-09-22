@@ -142,9 +142,9 @@ describe.each(VERSIONS)('$version delegator count', ({ createDelegate, lock, fre
     expect(history).toHaveLength(1);
   });
 
-  it('keeps delegators equal to the number of positive delegations', async () => {
+  it.each([0x5eed, 1, 42, 999, 12345])('keeps delegators equal to the number of positive delegations (seed %i)', async (initialSeed) => {
     // mulberry32, seeded so failures reproduce
-    let seed = 0x5eed;
+    let seed = initialSeed;
     const rand = (n: number) => {
       seed = (seed + 0x6d2b79f5) | 0;
       let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
@@ -163,7 +163,10 @@ describe.each(VERSIONS)('$version delegator count', ({ createDelegate, lock, fre
       else if (roll === 1) wad = balance;
       else wad = BigInt(rand(50) + 1);
 
-      if (rand(2) === 0 || wad > balance) {
+      // an over-free drives the stored amount negative, which production shows
+      // happening when a Free is indexed without its matching Lock
+      const overFree = rand(8) === 0;
+      if (!overFree && (rand(2) === 0 || wad > balance)) {
         events.push(lock(usr, wad));
         balances.set(usr, balance + wad);
       } else {

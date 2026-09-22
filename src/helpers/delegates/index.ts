@@ -33,7 +33,7 @@ export async function delegationLockHandler(
   const newAmount = previousAmount + amount;
 
   let updatedDelegate = { ...delegateWithDelegation };
-  if (previousAmount === 0n && newAmount > 0n) {
+  if (previousAmount <= 0n && newAmount > 0n) {
     updatedDelegate = {
       ...updatedDelegate,
       delegators: updatedDelegate.delegators + 1,
@@ -102,7 +102,7 @@ export async function delegationFreeHandler(
 
   let updatedDelegate = { ...delegateWithDelegation };
 
-  if (previousAmount > 0n && newAmount === 0n) {
+  if (previousAmount > 0n && newAmount <= 0n) {
     updatedDelegate = {
       ...updatedDelegate,
       delegators: updatedDelegate.delegators - 1,

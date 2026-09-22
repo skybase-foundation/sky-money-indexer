@@ -37,7 +37,7 @@ indexer.onEvent({ contract: 'VoteDelegateV3', event: 'Lock' }, async ({ event, c
   const previousAmount = delegation.amount;
   const newAmount = previousAmount + amount;
 
-  if (previousAmount === 0n && newAmount > 0n) {
+  if (previousAmount <= 0n && newAmount > 0n) {
     updatedDelegate = {
       ...updatedDelegate,
       delegators: updatedDelegate.delegators + 1,
@@ -107,7 +107,7 @@ indexer.onEvent({ contract: 'VoteDelegateV3', event: 'Free' }, async ({ event, c
   const previousAmount = delegation.amount;
   const newAmount = previousAmount - amount;
 
-  if (previousAmount > 0n && newAmount === 0n) {
+  if (previousAmount > 0n && newAmount <= 0n) {
     updatedDelegate = {
       ...updatedDelegate,
       delegators: updatedDelegate.delegators - 1,
