@@ -17,7 +17,7 @@ export async function delegationLockHandler(
   chainId: number,
   context: EvmOnEventContext,
 ): Promise<void> {
-  // a zero-wad lock changes nothing, but would still re-arm the delegators guard
+  // a zero-wad lock leaves the delegation unchanged, so it must not move the count
   if (amount === 0n) {
     return;
   }
@@ -85,7 +85,7 @@ export async function delegationFreeHandler(
   chainId: number,
   context: EvmOnEventContext,
 ): Promise<void> {
-  // a zero-wad free changes nothing, but would still re-arm the delegators guard
+  // a zero-wad free leaves the delegation unchanged, so it must not move the count
   if (amount === 0n) {
     return;
   }

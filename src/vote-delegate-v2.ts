@@ -6,7 +6,7 @@ indexer.onEvent({ contract: 'VoteDelegateV2', event: 'Lock' }, async ({ event, c
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;
 
-  // lock(0) is callable by anyone and changes nothing
+  // a zero-wad lock leaves the delegation unchanged, so it must not move the count
   if (amount === 0n) return;
 
   const delegate = await context.Delegate.get(
@@ -76,7 +76,7 @@ indexer.onEvent({ contract: 'VoteDelegateV2', event: 'Free' }, async ({ event, c
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;
 
-  // free(0) is callable by anyone and changes nothing
+  // a zero-wad free leaves the delegation unchanged, so it must not move the count
   if (amount === 0n) return;
 
   const delegate = await context.Delegate.get(
