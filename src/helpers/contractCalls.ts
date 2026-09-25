@@ -4,6 +4,11 @@ import {
   ContractFunctionZeroDataError,
   createPublicClient,
   http,
+  HttpRequestError,
+  RpcError,
+  RpcRequestError,
+  TimeoutError,
+  WebSocketRequestError,
   type PublicClient,
   type Address,
 } from 'viem';
@@ -102,18 +107,31 @@ function getClient(chainId: number): PublicClient {
   return client;
 }
 
-// True when the call reached the contract and it reverted or returned no data
-// (e.g. an EOA or a contract without the function). Transport errors (timeouts,
-// rate limits, bad RPC responses) are not reverts: an effect must throw on those
-// instead of caching a fallback value.
-function isRevertError(error: unknown): boolean {
-  return (
-    error instanceof BaseError &&
-    !!error.walk(
+// True when the RPC request failed (network error, timeout, rate limit, node
+// error), so the effect must throw instead of caching a fallback value.
+// Everything else reached the contract: a revert, no return data (an EOA or a
+// contract without the function) or return data that doesn't decode, which
+// viem reports through several error classes. Those are deterministic and must
+// not throw: anyone can etch any address, and a throw would halt the indexer on
+// that event for good.
+export function isRequestError(error: unknown): boolean {
+  if (!(error instanceof BaseError)) return true;
+  if (
+    error.walk(
       e =>
         e instanceof ContractFunctionRevertedError ||
         e instanceof ContractFunctionZeroDataError,
     )
+  ) {
+    return false;
+  }
+  return !!error.walk(
+    e =>
+      e instanceof HttpRequestError ||
+      e instanceof WebSocketRequestError ||
+      e instanceof TimeoutError ||
+      e instanceof RpcRequestError ||
+      e instanceof RpcError,
   );
 }
 
@@ -227,8 +245,8 @@ export const readSpellDescriptionEffect = createEffect(
       });
       return result as string;
     } catch (error) {
-      if (isRevertError(error)) return '';
-      throw error;
+      if (isRequestError(error)) throw error;
+      return '';
     }
   },
 );
@@ -253,9 +271,9 @@ export const readSpellExpirationEffect = createEffect(
       });
       return result as bigint;
     } catch (error) {
+      if (isRequestError(error)) throw error;
       // Not a spell
-      if (isRevertError(error)) return null;
-      throw error;
+      return null;
     }
   },
 );

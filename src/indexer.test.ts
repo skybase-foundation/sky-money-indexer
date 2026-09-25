@@ -2,6 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { createTestIndexer } from 'envio';
 import './EventHandlers';
 import { ZERO_ADDRESS } from './helpers/constants';
+import { isRequestError } from './helpers/contractCalls';
+import {
+  createPublicClient,
+  custom,
+  encodeAbiParameters,
+  HttpRequestError,
+  type EIP1193RequestFn,
+} from 'viem';
+import { mainnet } from 'viem/chains';
 
 const CALLER = '0x1111111111111111111111111111111111111111';
 const USR = '0x2222222222222222222222222222222222222222';
@@ -310,3 +319,76 @@ describe('DSChiefV2 slates', () => {
     ).rejects.toThrow();
   });
 });
+
+describe('isRequestError', () => {
+  const spellAbi = [
+    { name: 'expiration', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'uint256' }] },
+    { name: 'description', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'string' }] },
+  ] as const;
+
+  // Reads through a stubbed transport, directly or batched through multicall3
+  // like the indexer's clients, and returns the error viem raises
+  async function readError(
+    functionName: 'expiration' | 'description',
+    request: EIP1193RequestFn,
+    multicall: boolean,
+  ): Promise<unknown> {
+    const client = createPublicClient({
+      chain: mainnet,
+      batch: multicall ? { multicall: true } : undefined,
+      transport: custom({ request }, { retryCount: 0 }),
+    });
+    try {
+      await client.readContract({ address: '0x1111111111111111111111111111111111111111', abi: spellAbi, functionName });
+    } catch (error) {
+      return error;
+    }
+    throw new Error('expected the read to fail');
+  }
+
+  // eth_call answer for a call that succeeds with `data`, or reverts in the multicall case
+  const returns = (data: `0x${string}`, multicall: boolean, success = true) =>
+    (async () =>
+      multicall
+        ? encodeAbiParameters(
+            [{ type: 'tuple[]', components: [{ type: 'bool' }, { type: 'bytes' }] }],
+            [[[success, data]]],
+          )
+        : data) as unknown as EIP1193RequestFn;
+
+  describe.each([false, true])('multicall: %s', multicall => {
+    it('treats data that does not decode as the contract answering', async () => {
+      expect(isRequestError(await readError('expiration', returns('0x01', multicall), multicall))).toBe(false);
+      expect(
+        isRequestError(await readError('description', returns(`0x${'ff'.repeat(32)}`, multicall), multicall)),
+      ).toBe(false);
+    });
+
+    it('treats an empty return as the contract answering', async () => {
+      expect(isRequestError(await readError('expiration', returns('0x', multicall), multicall))).toBe(false);
+    });
+
+    it('treats a failed HTTP request as a request error', async () => {
+      const request = (async () => {
+        throw new HttpRequestError({ url: 'https://rpc', status: 503 });
+      }) as unknown as EIP1193RequestFn;
+      expect(isRequestError(await readError('expiration', request, multicall))).toBe(true);
+    });
+
+    it('treats a JSON-RPC error such as a rate limit as a request error', async () => {
+      const request = (async () => {
+        throw { code: -32005, message: 'limit exceeded' };
+      }) as unknown as EIP1193RequestFn;
+      expect(isRequestError(await readError('expiration', request, multicall))).toBe(true);
+    });
+  });
+
+  it('treats a reverted multicall sub-call as the contract answering', async () => {
+    expect(isRequestError(await readError('expiration', returns('0x', true, false), true))).toBe(false);
+  });
+
+  it('treats an error viem did not raise as a request error', () => {
+    expect(isRequestError(new Error('No RPC client configured for chain 5'))).toBe(true);
+  });
+});
+
