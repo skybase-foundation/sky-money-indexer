@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createTestIndexer } from 'envio';
 import './EventHandlers';
 import { EMPTY_SLATE, ZERO_ADDRESS } from './helpers/constants';
@@ -272,15 +272,36 @@ describe('DSChiefV2 slates', () => {
   it('fails instead of recording an empty vote when the slate was never etched', async () => {
     const indexer = createTestIndexer();
 
-    // The handler error stops the indexer, which surfaces here as the worker exiting
-    await expect(
-      indexer.process({
-        chains: {
-          1: {
-            simulate: [{ contract: 'DSChiefV2', event: 'Vote', params: { usr: VOTER, slate: SLATE } }],
+    // The handler error stops the indexer, which only surfaces here as the worker
+    // exiting, so read the handler's message from the worker's error log
+    const logLevel = process.env.LOG_LEVEL;
+    process.env.LOG_LEVEL = 'error';
+    const output: string[] = [];
+    const capture = (stream: NodeJS.WriteStream) => {
+      const write = stream.write.bind(stream);
+      return vi.spyOn(stream, 'write').mockImplementation(((chunk: string | Uint8Array) => {
+        output.push(chunk.toString());
+        return true;
+      }) as typeof write);
+    };
+    const spies = [capture(process.stdout), capture(process.stderr)];
+
+    try {
+      await expect(
+        indexer.process({
+          chains: {
+            1: {
+              simulate: [{ contract: 'DSChiefV2', event: 'Vote', params: { usr: VOTER, slate: SLATE } }],
+            },
           },
-        },
-      }),
-    ).rejects.toThrow();
+        }),
+      ).rejects.toThrow('Worker exited');
+    } finally {
+      spies.forEach(spy => spy.mockRestore());
+      if (logLevel === undefined) delete process.env.LOG_LEVEL;
+      else process.env.LOG_LEVEL = logLevel;
+    }
+
+    expect(output.join('')).toContain(`SlateV2 1-${SLATE} not found for Vote`);
   });
 });

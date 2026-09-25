@@ -160,17 +160,27 @@ export const readCurvePoolCoinEffect = createEffect(
     rateLimit: { calls: 5, per: 'second' as const },
     cache: true,
   },
-  async ({ input }) => {
-    const client = getClient(input.chainId);
-    const result = await client.readContract({
-      address: input.poolAddress as Address,
-      abi: curveCoinsAbi,
-      functionName: 'coins',
-      args: [input.index],
-    });
-    // No fallback: the pool is a fixed contract and the index comes from its
-    // own TokenExchange event, so a failed read is never a valid answer and
-    // must not be cached as the zero address
-    return (result as string).toLowerCase();
+  async ({ input, context }) => {
+    try {
+      const client = getClient(input.chainId);
+      const result = await client.readContract({
+        address: input.poolAddress as Address,
+        abi: curveCoinsAbi,
+        functionName: 'coins',
+        args: [input.index],
+      });
+      return (result as string).toLowerCase();
+    } catch (error) {
+      // No fallback: the pool is a fixed contract and the index comes from its
+      // own TokenExchange event, so a failed read is never a valid answer and
+      // must not be cached as the zero address
+      context.log.error('Failed to read Curve pool coin', {
+        poolAddress: input.poolAddress,
+        index: input.index.toString(),
+        chainId: input.chainId.toString(),
+        err: error,
+      });
+      throw error;
+    }
   },
 );

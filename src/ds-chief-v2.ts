@@ -90,6 +90,9 @@ async function _handleSlateVote(
   const voter = await getVoter(sender, event.chainId, context);
   let slate = await context.SlateV2.get(`${event.chainId}-${slateId}`);
   if (!slate) {
+    // In Envio's preload pass, an Etch earlier in the same transaction
+    // (vote(address[])) isn't stored yet; the processing pass that follows has it.
+    if (context.isPreload) return;
     // Every other slate is etched (in an earlier event, or earlier in the same
     // transaction for vote(address[])) before it can be voted for
     if (slateId !== EMPTY_SLATE) {
