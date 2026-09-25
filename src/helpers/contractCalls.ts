@@ -10,36 +10,6 @@ import { createEffect, S } from 'envio';
 import { ZERO_ADDRESS } from './constants';
 
 // ABI fragments for the contract calls we need
-const dsChiefSlatesAbi = [
-  {
-    name: 'slates',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [
-      { name: 'id', type: 'bytes32' },
-      { name: 'index', type: 'uint256' },
-    ],
-    outputs: [{ name: '', type: 'address' }],
-  },
-] as const;
-
-const dsSpellAbi = [
-  {
-    name: 'description',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ name: '', type: 'string' }],
-  },
-  {
-    name: 'expiration',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ name: '', type: 'uint256' }],
-  },
-] as const;
-
 const mkrSkyRateAbi = [
   {
     name: 'rate',
@@ -217,84 +187,6 @@ export const readCurvePoolCoinEffect = createEffect(
       return (result as string).toLowerCase();
     } catch {
       return '0x0000000000000000000000000000000000000000';
-    }
-  },
-);
-
-// readDSChiefSlateEffect: returning '' on index out-of-bounds is the expected
-// loop termination signal used by createSlate/createSlateV2
-export const readDSChiefSlateEffect = createEffect(
-  {
-    name: 'readDSChiefSlate',
-    input: {
-      chainId: S.int32,
-      chiefAddress: S.string,
-      slateId: S.string,
-      index: S.bigint,
-    },
-    output: S.string,
-    rateLimit: { calls: 10, per: 'second' as const },
-    cache: true,
-  },
-  async ({ input }) => {
-    const client = getClient(input.chainId);
-    try {
-      const result = await client.readContract({
-        address: input.chiefAddress as Address,
-        abi: dsChiefSlatesAbi,
-        functionName: 'slates',
-        args: [input.slateId as `0x${string}`, input.index],
-      });
-      return (result as string).toLowerCase();
-    } catch {
-      // Index out of bounds = end of slate
-      return '';
-    }
-  },
-);
-
-export const readSpellDescriptionEffect = createEffect(
-  {
-    name: 'readSpellDescription',
-    input: { chainId: S.int32, spellAddress: S.string },
-    output: S.string,
-    rateLimit: { calls: 5, per: 'second' as const },
-    cache: true,
-  },
-  async ({ input }) => {
-    const client = getClient(input.chainId);
-    try {
-      const result = await client.readContract({
-        address: input.spellAddress as Address,
-        abi: dsSpellAbi,
-        functionName: 'description',
-      });
-      return result as string;
-    } catch {
-      return '';
-    }
-  },
-);
-
-export const readSpellExpirationEffect = createEffect(
-  {
-    name: 'readSpellExpiration',
-    input: { chainId: S.int32, spellAddress: S.string },
-    output: S.nullable(S.bigint),
-    rateLimit: { calls: 5, per: 'second' as const },
-    cache: true,
-  },
-  async ({ input }) => {
-    const client = getClient(input.chainId);
-    try {
-      const result = await client.readContract({
-        address: input.spellAddress as Address,
-        abi: dsSpellAbi,
-        functionName: 'expiration',
-      });
-      return result as bigint;
-    } catch {
-      return null;
     }
   },
 );

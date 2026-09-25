@@ -17,6 +17,10 @@ contracts:
         field_selection:
           transaction_fields:
             - hash
+      - event: 'Etch(bytes32 indexed slate, address[] yays)'
+        field_selection:
+          transaction_fields:
+            - hash
       - event: 'Vote(address indexed usr, bytes32 indexed slate)'
         field_selection:
           transaction_fields:

@@ -1,12 +1,13 @@
 import { indexer } from 'envio';
 import type { EvmEvent, EvmOnEventContext } from 'envio';
-import { SpellState } from './helpers/constants';
+import { EMPTY_SLATE, SpellState } from './helpers/constants';
 import {
   addWeightToSpellsV2,
   createExecutiveVotingPowerChangeV2,
   createSlateV2,
   getVoter,
   removeWeightFromSpellsV2,
+  saveSlateV2,
   toDecimal,
 } from './helpers/helpers';
 
@@ -66,6 +67,14 @@ indexer.onEvent({ contract: 'DSChiefV2', event: 'Free' }, async ({ event, contex
   await removeWeightFromSpellsV2(voter.currentSpellsV2, amount, context);
 });
 
+indexer.onEvent({ contract: 'DSChiefV2', event: 'Etch' }, async ({ event, context }) => {
+  // etch() can be called again for an existing slate, whose contents are fixed by its hash
+  const slate = await context.SlateV2.get(`${event.chainId}-${event.params.slate}`);
+  if (slate) return;
+
+  await createSlateV2(event, context);
+});
+
 indexer.onEvent({ contract: 'DSChiefV2', event: 'Vote' }, async ({ event, context }) => {
   const sender = event.params.usr;
   const slateId = event.params.slate;
@@ -81,7 +90,17 @@ async function _handleSlateVote(
   const voter = await getVoter(sender, event.chainId, context);
   let slate = await context.SlateV2.get(`${event.chainId}-${slateId}`);
   if (!slate) {
-    slate = await createSlateV2(slateId, event, context);
+    // In Envio's preload pass, an Etch earlier in the same transaction
+    // (vote(address[])) isn't stored yet; the processing pass that follows has it.
+    if (context.isPreload) return;
+    // Every other slate is etched (in an earlier event, or earlier in the same
+    // transaction for vote(address[])) before it can be voted for
+    if (slateId !== EMPTY_SLATE) {
+      throw new Error(
+        `SlateV2 ${event.chainId}-${slateId} not found for Vote in ${event.transaction.hash}`,
+      );
+    }
+    slate = saveSlateV2(slateId, [], event, context);
   }
 
   // Remove votes from previous spells

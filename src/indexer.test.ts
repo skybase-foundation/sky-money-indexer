@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createTestIndexer } from 'envio';
+import { EMPTY_SLATE, ZERO_ADDRESS } from './helpers/constants';
 
 const CALLER = '0x1111111111111111111111111111111111111111';
 const USR = '0x2222222222222222222222222222222222222222';
@@ -179,5 +180,105 @@ describe.each(VERSIONS)('$version delegator count', ({ createDelegate, lock, fre
 
     const delegate = await expectCountMatchesPositiveRows(indexer);
     expect(delegate.delegators).toBe([...balances.values()].filter(b => b > 0n).length);
+  });
+});
+
+describe('DSChiefV2 slates', () => {
+  const VOTER = '0x5555555555555555555555555555555555555555';
+  const SPELL_A = '0x6666666666666666666666666666666666666666';
+  const SPELL_B = '0x7777777777777777777777777777777777777777';
+  const SLATE = '0x7a7df2645617a7ced6deed4b73fc7c302fb40daab4d8a1849dfd93859ddff783';
+
+  it('builds the slate from Etch and records votes for each spell on it', async () => {
+    const indexer = createTestIndexer();
+
+    await indexer.process({
+      chains: {
+        1: {
+          simulate: [
+            { contract: 'DSChiefV2', event: 'Lock', params: { usr: VOTER, wad: 100n } },
+            // vote(address[]) emits Etch and then Vote in the same transaction
+            {
+              contract: 'DSChiefV2',
+              event: 'Etch',
+              params: { slate: SLATE, yays: [ZERO_ADDRESS, SPELL_A, SPELL_B] },
+            },
+            { contract: 'DSChiefV2', event: 'Vote', params: { usr: VOTER, slate: SLATE } },
+          ],
+        },
+      },
+    });
+
+    const slate = await indexer.SlateV2.getOrThrow(`1-${SLATE}`);
+    expect(slate.yays).toEqual([`1-${SPELL_A}`, `1-${SPELL_B}`]);
+
+    // Every address gets a SpellV2 without any contract reads
+    const spellA = await indexer.SpellV2.getOrThrow(`1-${SPELL_A}`);
+    expect(spellA.state).toBe('ACTIVE');
+    expect(spellA.description).toBeUndefined();
+    expect(spellA.expiryTime).toBeUndefined();
+    expect(await indexer.SpellV2.get(`1-${ZERO_ADDRESS}`)).toBeUndefined();
+
+    const voter = await indexer.Voter.getOrThrow(`1-${VOTER}`);
+    expect(voter.currentSpellsV2).toEqual([`1-${SPELL_A}`, `1-${SPELL_B}`]);
+
+    for (const spell of [SPELL_A, SPELL_B]) {
+      const vote = await indexer.ExecutiveVoteV2.getOrThrow(`1-${spell}-${VOTER}`);
+      expect(vote.weight).toBe(100n);
+      expect((await indexer.SpellV2.getOrThrow(`1-${spell}`)).totalWeightedVotes).toBe(100n);
+    }
+  });
+
+  it('keeps the original slate when it is etched again', async () => {
+    const indexer = createTestIndexer();
+
+    await indexer.process({
+      chains: {
+        1: {
+          simulate: [
+            { contract: 'DSChiefV2', event: 'Etch', block: { number: 22_400_000 }, params: { slate: SLATE, yays: [SPELL_A] } },
+            { contract: 'DSChiefV2', event: 'Etch', block: { number: 22_400_010 }, params: { slate: SLATE, yays: [SPELL_A] } },
+          ],
+        },
+      },
+    });
+
+    const slate = await indexer.SlateV2.getOrThrow(`1-${SLATE}`);
+    expect(slate.creationBlock).toBe(22_400_000n);
+  });
+
+  it('handles a vote for the empty slate, which is never etched', async () => {
+    const indexer = createTestIndexer();
+
+    await indexer.process({
+      chains: {
+        1: {
+          simulate: [
+            { contract: 'DSChiefV2', event: 'Lock', params: { usr: VOTER, wad: 100n } },
+            { contract: 'DSChiefV2', event: 'Etch', params: { slate: SLATE, yays: [SPELL_A] } },
+            { contract: 'DSChiefV2', event: 'Vote', params: { usr: VOTER, slate: SLATE } },
+            { contract: 'DSChiefV2', event: 'Vote', params: { usr: VOTER, slate: EMPTY_SLATE } },
+          ],
+        },
+      },
+    });
+
+    expect((await indexer.SlateV2.getOrThrow(`1-${EMPTY_SLATE}`)).yays).toEqual([]);
+    expect((await indexer.Voter.getOrThrow(`1-${VOTER}`)).currentSpellsV2).toEqual([]);
+    expect((await indexer.SpellV2.getOrThrow(`1-${SPELL_A}`)).totalWeightedVotes).toBe(0n);
+  });
+
+  it('fails instead of recording an empty vote when the slate was never etched', async () => {
+    const indexer = createTestIndexer();
+
+    await expect(
+      indexer.process({
+        chains: {
+          1: {
+            simulate: [{ contract: 'DSChiefV2', event: 'Vote', params: { usr: VOTER, slate: SLATE } }],
+          },
+        },
+      }),
+    ).rejects.toThrow(`SlateV2 1-${SLATE} not found for Vote`);
   });
 });
