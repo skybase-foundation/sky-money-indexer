@@ -227,9 +227,7 @@ export const readCurvePoolCoinEffect = createEffect(
 
 export const readSpellDescriptionEffect = createEffect(
   {
-    // Renamed from 'readSpellDescription' to drop results cached before
-    // RPC errors stopped being swallowed
-    name: 'readSpellDescription_v2',
+    name: 'readSpellDescription',
     input: { chainId: S.int32, spellAddress: S.string },
     output: S.string,
     rateLimit: { calls: 5, per: 'second' as const },
@@ -253,9 +251,7 @@ export const readSpellDescriptionEffect = createEffect(
 
 export const readSpellExpirationEffect = createEffect(
   {
-    // Renamed from 'readSpellExpiration' to drop results cached before
-    // RPC errors stopped being swallowed
-    name: 'readSpellExpiration_v2',
+    name: 'readSpellExpiration',
     input: { chainId: S.int32, spellAddress: S.string },
     output: S.nullable(S.bigint),
     rateLimit: { calls: 5, per: 'second' as const },
