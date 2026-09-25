@@ -1,7 +1,6 @@
 import { BigDecimal } from 'envio';
 import type { Entity, EvmEvent, EvmOnEventContext } from 'envio';
 import {
-  readDSChiefSlateEffect,
   readSpellDescriptionEffect,
   readSpellExpirationEffect,
 } from './contractCalls';
@@ -65,25 +64,16 @@ export function createExecutiveVotingPowerChangeV2(
   };
 }
 
+// Builds the slate from the Etch event, which carries the full list of yays,
+// so no chief.slates() reads are needed
 export async function createSlateV2(
-  slateID: string,
-  event: EvmEvent<'DSChiefV2', 'Vote'>,
+  event: EvmEvent<'DSChiefV2', 'Etch'>,
   context: EvmOnEventContext,
 ): Promise<SlateV2> {
   const yays: string[] = [];
-  const chiefAddress = event.srcAddress;
   const chainId = event.chainId;
 
-  // Read slate contents by iterating until empty string is returned (index out of bounds)
-  for (let i = 0n; ; i++) {
-    const spellAddress = await context.effect(readDSChiefSlateEffect, {
-      chainId,
-      chiefAddress,
-      slateId: slateID,
-      index: i,
-    });
-    if (!spellAddress) break;
-
+  for (const spellAddress of event.params.yays) {
     if (spellAddress !== ZERO_ADDRESS) {
       const spellId = `${chainId}-${spellAddress}`;
       let spell = await context.SpellV2.get(spellId);
@@ -132,7 +122,7 @@ export async function createSlateV2(
   }
 
   const slate = {
-    id: `${chainId}-${slateID}`,
+    id: `${chainId}-${event.params.slate}`,
     chainId,
     yays,
     txnHash: event.transaction.hash,

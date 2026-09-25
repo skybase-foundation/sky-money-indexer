@@ -1,4 +1,7 @@
 import {
+  BaseError,
+  ContractFunctionRevertedError,
+  ContractFunctionZeroDataError,
   createPublicClient,
   http,
   type PublicClient,
@@ -9,19 +12,6 @@ import type { Chain } from 'viem';
 import { createEffect, S } from 'envio';
 
 // ABI fragments for the contract calls we need
-const dsChiefSlatesAbi = [
-  {
-    name: 'slates',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [
-      { name: 'id', type: 'bytes32' },
-      { name: 'index', type: 'uint256' },
-    ],
-    outputs: [{ name: '', type: 'address' }],
-  },
-] as const;
-
 const dsSpellAbi = [
   {
     name: 'description',
@@ -110,6 +100,21 @@ function getClient(chainId: number): PublicClient {
     throw new Error(`No RPC client configured for chain ${chainId}`);
   }
   return client;
+}
+
+// True when the call reached the contract and it reverted or returned no data
+// (e.g. an EOA or a contract without the function). Transport errors (timeouts,
+// rate limits, bad RPC responses) are not reverts: an effect must throw on those
+// instead of caching a fallback value.
+function isRevertError(error: unknown): boolean {
+  return (
+    error instanceof BaseError &&
+    !!error.walk(
+      e =>
+        e instanceof ContractFunctionRevertedError ||
+        e instanceof ContractFunctionZeroDataError,
+    )
+  );
 }
 
 // === Effects ===
@@ -202,41 +207,11 @@ export const readCurvePoolCoinEffect = createEffect(
   },
 );
 
-// readDSChiefSlateEffect: returning '' on index out-of-bounds is the expected
-// loop termination signal used by createSlate/createSlateV2
-export const readDSChiefSlateEffect = createEffect(
-  {
-    name: 'readDSChiefSlate',
-    input: {
-      chainId: S.int32,
-      chiefAddress: S.string,
-      slateId: S.string,
-      index: S.bigint,
-    },
-    output: S.string,
-    rateLimit: { calls: 10, per: 'second' as const },
-    cache: true,
-  },
-  async ({ input }) => {
-    try {
-      const client = getClient(input.chainId);
-      const result = await client.readContract({
-        address: input.chiefAddress as Address,
-        abi: dsChiefSlatesAbi,
-        functionName: 'slates',
-        args: [input.slateId as `0x${string}`, input.index],
-      });
-      return (result as string).toLowerCase();
-    } catch {
-      // Index out of bounds = end of slate
-      return '';
-    }
-  },
-);
-
 export const readSpellDescriptionEffect = createEffect(
   {
-    name: 'readSpellDescription',
+    // Renamed from 'readSpellDescription' to drop results cached before
+    // RPC errors stopped being swallowed
+    name: 'readSpellDescription_v2',
     input: { chainId: S.int32, spellAddress: S.string },
     output: S.string,
     rateLimit: { calls: 5, per: 'second' as const },
@@ -251,15 +226,18 @@ export const readSpellDescriptionEffect = createEffect(
         functionName: 'description',
       });
       return result as string;
-    } catch {
-      return '';
+    } catch (error) {
+      if (isRevertError(error)) return '';
+      throw error;
     }
   },
 );
 
 export const readSpellExpirationEffect = createEffect(
   {
-    name: 'readSpellExpiration',
+    // Renamed from 'readSpellExpiration' to drop results cached before
+    // RPC errors stopped being swallowed
+    name: 'readSpellExpiration_v2',
     input: { chainId: S.int32, spellAddress: S.string },
     output: S.nullable(S.bigint),
     rateLimit: { calls: 5, per: 'second' as const },
@@ -274,8 +252,10 @@ export const readSpellExpirationEffect = createEffect(
         functionName: 'expiration',
       });
       return result as bigint;
-    } catch {
-      return null;
+    } catch (error) {
+      // Not a spell
+      if (isRevertError(error)) return null;
+      throw error;
     }
   },
 );
