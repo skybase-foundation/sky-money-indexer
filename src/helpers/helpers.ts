@@ -121,9 +121,18 @@ export async function createSlateV2(
     }
   }
 
+  return saveSlateV2(event.params.slate, yays, event, context);
+}
+
+export function saveSlateV2(
+  slateHash: string,
+  yays: string[],
+  event: EvmEvent<'DSChiefV2', 'Etch'> | EvmEvent<'DSChiefV2', 'Vote'>,
+  context: EvmOnEventContext,
+): SlateV2 {
   const slate = {
-    id: `${chainId}-${event.params.slate}`,
-    chainId,
+    id: `${event.chainId}-${slateHash}`,
+    chainId: event.chainId,
     yays,
     txnHash: event.transaction.hash,
     creationBlock: BigInt(event.block.number),

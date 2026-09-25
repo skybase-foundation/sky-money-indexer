@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createTestIndexer } from 'envio';
 import './EventHandlers';
-import { ZERO_ADDRESS } from './helpers/constants';
+import { EMPTY_SLATE, ZERO_ADDRESS } from './helpers/constants';
 import { isRequestError } from './helpers/contractCalls';
 import {
   createPublicClient,
@@ -198,7 +198,6 @@ describe('DSChiefV2 slates', () => {
   const SPELL_A = '0x6666666666666666666666666666666666666666';
   const SPELL_B = '0x7777777777777777777777777777777777777777';
   const SLATE = '0x7a7df2645617a7ced6deed4b73fc7c302fb40daab4d8a1849dfd93859ddff783';
-  const EMPTY_SLATE = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470';
 
   // Seeding the spells keeps the Etch handler from reading them over RPC
   function seedSpells(indexer: ReturnType<typeof createTestIndexer>) {

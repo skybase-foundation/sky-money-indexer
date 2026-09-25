@@ -7,6 +7,7 @@ import {
   createSlateV2,
   getVoter,
   removeWeightFromSpellsV2,
+  saveSlateV2,
   toDecimal,
 } from './helpers/helpers';
 
@@ -96,15 +97,7 @@ async function _handleSlateVote(
         `SlateV2 ${event.chainId}-${slateId} not found for Vote in ${event.transaction.hash}`,
       );
     }
-    slate = {
-      id: `${event.chainId}-${slateId}`,
-      chainId: event.chainId,
-      yays: [],
-      txnHash: event.transaction.hash,
-      creationBlock: BigInt(event.block.number),
-      creationTime: BigInt(event.block.timestamp),
-    };
-    context.SlateV2.set(slate);
+    slate = saveSlateV2(slateId, [], event, context);
   }
 
   // Remove votes from previous spells
