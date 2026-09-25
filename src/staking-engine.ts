@@ -108,6 +108,14 @@ indexer.onEvent({ contract: 'StakingEngine', event: 'StakingSelectVoteDelegate' 
         voteDelegate_id: newDelegate.id,
       });
 
+      // The engines revert on re-selecting the current delegate, so this only
+      // fires if the indexed urn disagrees with the chain. Running free then
+      // lock here would apply the lock to a copy of the delegate read before
+      // the free was written, inflating its total by the locked amount.
+      if (oldDelegate?.id === newDelegate.id) {
+        return;
+      }
+
       // handle delegation change
       if (oldDelegate && urn.skyLocked > 0n) {
         await delegationFreeHandler(
