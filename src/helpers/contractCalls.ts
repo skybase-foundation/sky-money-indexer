@@ -1,14 +1,6 @@
 import {
-  BaseError,
-  ContractFunctionRevertedError,
-  ContractFunctionZeroDataError,
   createPublicClient,
   http,
-  HttpRequestError,
-  RpcError,
-  RpcRequestError,
-  TimeoutError,
-  WebSocketRequestError,
   type PublicClient,
   type Address,
 } from 'viem';
@@ -17,23 +9,6 @@ import type { Chain } from 'viem';
 import { createEffect, S } from 'envio';
 
 // ABI fragments for the contract calls we need
-const dsSpellAbi = [
-  {
-    name: 'description',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ name: '', type: 'string' }],
-  },
-  {
-    name: 'expiration',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ name: '', type: 'uint256' }],
-  },
-] as const;
-
 const mkrSkyRateAbi = [
   {
     name: 'rate',
@@ -109,34 +84,6 @@ function getClient(chainId: number): PublicClient {
     );
   }
   return client;
-}
-
-// True when the RPC request failed (network error, timeout, rate limit, node
-// error), so the effect must throw instead of caching a fallback value.
-// Everything else reached the contract: a revert, no return data (an EOA or a
-// contract without the function) or return data that doesn't decode, which
-// viem reports through several error classes. Those are deterministic and must
-// not throw: anyone can etch any address, and a throw would halt the indexer on
-// that event for good.
-export function isRequestError(error: unknown): boolean {
-  if (!(error instanceof BaseError)) return true;
-  if (
-    error.walk(
-      e =>
-        e instanceof ContractFunctionRevertedError ||
-        e instanceof ContractFunctionZeroDataError,
-    )
-  ) {
-    return false;
-  }
-  return !!error.walk(
-    e =>
-      e instanceof HttpRequestError ||
-      e instanceof WebSocketRequestError ||
-      e instanceof TimeoutError ||
-      e instanceof RpcRequestError ||
-      e instanceof RpcError,
-  );
 }
 
 // === Effects ===
@@ -225,54 +172,5 @@ export const readCurvePoolCoinEffect = createEffect(
     // own TokenExchange event, so a failed read is never a valid answer and
     // must not be cached as the zero address
     return (result as string).toLowerCase();
-  },
-);
-
-export const readSpellDescriptionEffect = createEffect(
-  {
-    name: 'readSpellDescription',
-    input: { chainId: S.int32, spellAddress: S.string },
-    output: S.string,
-    rateLimit: { calls: 5, per: 'second' as const },
-    cache: true,
-  },
-  async ({ input }) => {
-    try {
-      const client = getClient(input.chainId);
-      const result = await client.readContract({
-        address: input.spellAddress as Address,
-        abi: dsSpellAbi,
-        functionName: 'description',
-      });
-      return result as string;
-    } catch (error) {
-      if (isRequestError(error)) throw error;
-      return '';
-    }
-  },
-);
-
-export const readSpellExpirationEffect = createEffect(
-  {
-    name: 'readSpellExpiration',
-    input: { chainId: S.int32, spellAddress: S.string },
-    output: S.nullable(S.bigint),
-    rateLimit: { calls: 5, per: 'second' as const },
-    cache: true,
-  },
-  async ({ input }) => {
-    try {
-      const client = getClient(input.chainId);
-      const result = await client.readContract({
-        address: input.spellAddress as Address,
-        abi: dsSpellAbi,
-        functionName: 'expiration',
-      });
-      return result as bigint;
-    } catch (error) {
-      if (isRequestError(error)) throw error;
-      // Not a spell
-      return null;
-    }
   },
 );
