@@ -1001,6 +1001,21 @@ type StakingOnKick {
   transactionHash: String!
 }
 
+"""
+Lookup from (engine, owner, index) to the urn address, persisted on Open so
+later events (Lock, Free, SelectFarm, ...) never need to resolve the urn via RPC.
+"""
+type UrnOwnerIndex {
+  "chainId-engineAddress-owner-index"
+  id: ID!
+  chainId: Int! @index
+  engine: String!
+  owner: String! @index
+  index: BigInt!
+  "Urn address (without chainId prefix)"
+  urn: String!
+}
+
 type StakingUrn {
   id: ID!
   chainId: Int! @index
