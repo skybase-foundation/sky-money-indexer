@@ -176,8 +176,8 @@ export const readCurvePoolCoinEffect = createEffect(
     cache: true,
   },
   async ({ input }) => {
+    const client = getClient(input.chainId);
     try {
-      const client = getClient(input.chainId);
       const result = await client.readContract({
         address: input.poolAddress as Address,
         abi: curveCoinsAbi,
