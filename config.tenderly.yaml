@@ -688,10 +688,15 @@ chains:
     rpc:
       - url: https://virtual.mainnet.eu.rpc.tenderly.co/${ENVIO_TENDERLY_TESTNET_PATH}
         for: sync
-        initial_block_interval: 2000
-        interval_ceiling: 5000
-        backoff_multiplicative: 0.5
-        acceleration_additive: 100
+        # Since envio 3 the RPC client no longer absorbs 429s, so every throttled
+        # request lands here as a failure. Shrink gently on errors and recover fast,
+        # or throttling collapses the range to a handful of blocks.
+        # Tenderly rejects eth_getLogs past 20,000 results. The densest 10,000-block
+        # span of these contracts (SavingsUsds, near block 24.35M) holds ~18,100.
+        initial_block_interval: 10000
+        interval_ceiling: 10000
+        backoff_multiplicative: 0.8
+        acceleration_additive: 2000
         backoff_millis: 5000
         query_timeout_millis: 30000
     start_block: 8122207
