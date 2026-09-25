@@ -206,8 +206,8 @@ export const readCurvePoolCoinEffect = createEffect(
     cache: true,
   },
   async ({ input }) => {
+    const client = getClient(input.chainId);
     try {
-      const client = getClient(input.chainId);
       const result = await client.readContract({
         address: input.poolAddress as Address,
         abi: curveCoinsAbi,
@@ -237,8 +237,8 @@ export const readDSChiefSlateEffect = createEffect(
     cache: true,
   },
   async ({ input }) => {
+    const client = getClient(input.chainId);
     try {
-      const client = getClient(input.chainId);
       const result = await client.readContract({
         address: input.chiefAddress as Address,
         abi: dsChiefSlatesAbi,
@@ -262,8 +262,8 @@ export const readSpellDescriptionEffect = createEffect(
     cache: true,
   },
   async ({ input }) => {
+    const client = getClient(input.chainId);
     try {
-      const client = getClient(input.chainId);
       const result = await client.readContract({
         address: input.spellAddress as Address,
         abi: dsSpellAbi,
@@ -285,8 +285,8 @@ export const readSpellExpirationEffect = createEffect(
     cache: true,
   },
   async ({ input }) => {
+    const client = getClient(input.chainId);
     try {
-      const client = getClient(input.chainId);
       const result = await client.readContract({
         address: input.spellAddress as Address,
         abi: dsSpellAbi,
