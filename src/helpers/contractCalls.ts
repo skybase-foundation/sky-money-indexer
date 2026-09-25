@@ -7,6 +7,7 @@ import {
 import { mainnet } from 'viem/chains';
 import type { Chain } from 'viem';
 import { createEffect, S } from 'envio';
+import { ZERO_ADDRESS } from './constants';
 
 // ABI fragments for the contract calls we need
 const mkrSkyRateAbi = [
@@ -42,14 +43,15 @@ const curveCoinsAbi = [
   },
 ] as const;
 
-// RPC URLs per chain. A chain without one gets no client: viem's http() would
-// otherwise fall back to the chain's rate-limited public RPC.
-const RPC_URLS: Record<number, string | undefined> = {
-  1: process.env.ENVIO_MAINNET_RPC_URL,
-  314310: process.env.ENVIO_TENDERLY_TESTNET_PATH
-    ? `https://virtual.mainnet.eu.rpc.tenderly.co/${process.env.ENVIO_TENDERLY_TESTNET_PATH}`
-    : undefined,
-};
+// RPC URLs per chain. Only chains with a configured URL get a client; an
+// empty URL would make viem silently fall back to the chain's public RPC.
+const RPC_URLS: Record<number, string> = {};
+if (process.env.ENVIO_MAINNET_RPC_URL) {
+  RPC_URLS[1] = process.env.ENVIO_MAINNET_RPC_URL;
+}
+if (process.env.ENVIO_TENDERLY_TESTNET_PATH) {
+  RPC_URLS[314310] = `https://virtual.mainnet.eu.rpc.tenderly.co/${process.env.ENVIO_TENDERLY_TESTNET_PATH}`;
+}
 
 // Tenderly fork inherits mainnet config but with its own chain ID
 const tenderly: Chain = {
@@ -67,7 +69,6 @@ const CHAINS: Record<number, Chain> = {
 // Pre-create public clients per chain at module level
 const clients: Record<number, PublicClient> = {};
 for (const [chainId, rpcUrl] of Object.entries(RPC_URLS)) {
-  if (!rpcUrl) continue;
   const id = Number(chainId);
   clients[id] = createPublicClient({
     chain: CHAINS[id] || mainnet,
@@ -79,23 +80,29 @@ for (const [chainId, rpcUrl] of Object.entries(RPC_URLS)) {
 function getClient(chainId: number): PublicClient {
   const client = clients[chainId];
   if (!client) {
-    throw new Error(
-      `No RPC URL configured for chain ${chainId} (ENVIO_MAINNET_RPC_URL / ENVIO_TENDERLY_TESTNET_PATH)`,
-    );
+    throw new Error(`No RPC client configured for chain ${chainId}`);
   }
   return client;
 }
 
 // === Effects ===
 
+// Fallback only: urns are normally resolved from the UrnOwnerIndex entity
+// persisted on Open (see src/helpers/resolveUrn.ts). The call is pinned to the
+// event's block so a lagging RPC node can never answer for a not-yet-mined
+// urn, and a zero-address result is treated as an error (thrown, hence not
+// cached) so Envio retries instead of persisting a phantom urn.
+// The effect name is versioned so caches written by the old unpinned
+// `readOwnerUrns` effect can never be reused.
 export const readOwnerUrnsEffect = createEffect(
   {
-    name: 'readOwnerUrns',
+    name: 'readOwnerUrnsAtBlock',
     input: {
       chainId: S.int32,
       engineAddress: S.string,
       owner: S.string,
       index: S.bigint,
+      blockNumber: S.bigint,
     },
     output: S.string,
     rateLimit: { calls: 10, per: 'second' as const },
@@ -109,13 +116,21 @@ export const readOwnerUrnsEffect = createEffect(
         abi: ownerUrnsAbi,
         functionName: 'ownerUrns',
         args: [input.owner as Address, input.index],
+        blockNumber: input.blockNumber,
       });
-      return (result as string).toLowerCase();
+      const urn = (result as string).toLowerCase();
+      if (urn === ZERO_ADDRESS) {
+        throw new Error(
+          `ownerUrns(${input.owner}, ${input.index.toString()}) returned the zero address at block ${input.blockNumber.toString()}`,
+        );
+      }
+      return urn;
     } catch (error) {
       context.log.error('Failed to read ownerUrns', {
         engineAddress: input.engineAddress,
         owner: input.owner,
         index: input.index.toString(),
+        blockNumber: input.blockNumber.toString(),
         chainId: input.chainId.toString(),
         err: error,
       });
