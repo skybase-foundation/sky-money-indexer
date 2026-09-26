@@ -7,38 +7,9 @@ import {
 import { mainnet } from 'viem/chains';
 import type { Chain } from 'viem';
 import { createEffect, S } from 'envio';
+import { ZERO_ADDRESS } from './constants';
 
 // ABI fragments for the contract calls we need
-const dsChiefSlatesAbi = [
-  {
-    name: 'slates',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [
-      { name: 'id', type: 'bytes32' },
-      { name: 'index', type: 'uint256' },
-    ],
-    outputs: [{ name: '', type: 'address' }],
-  },
-] as const;
-
-const dsSpellAbi = [
-  {
-    name: 'description',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ name: '', type: 'string' }],
-  },
-  {
-    name: 'expiration',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ name: '', type: 'uint256' }],
-  },
-] as const;
-
 const mkrSkyRateAbi = [
   {
     name: 'rate',
@@ -72,13 +43,15 @@ const curveCoinsAbi = [
   },
 ] as const;
 
-// RPC URLs per chain
-const RPC_URLS: Record<number, string> = {
-  1: process.env.ENVIO_MAINNET_RPC_URL || '',
-  314310:
-    `https://virtual.mainnet.eu.rpc.tenderly.co/${process.env.ENVIO_TENDERLY_TESTNET_PATH}` ||
-    '',
-};
+// RPC URLs per chain. Only chains with a configured URL get a client; an
+// empty URL would make viem silently fall back to the chain's public RPC.
+const RPC_URLS: Record<number, string> = {};
+if (process.env.ENVIO_MAINNET_RPC_URL) {
+  RPC_URLS[1] = process.env.ENVIO_MAINNET_RPC_URL;
+}
+if (process.env.ENVIO_TENDERLY_TESTNET_PATH) {
+  RPC_URLS[314310] = `https://virtual.mainnet.eu.rpc.tenderly.co/${process.env.ENVIO_TENDERLY_TESTNET_PATH}`;
+}
 
 // Tenderly fork inherits mainnet config but with its own chain ID
 const tenderly: Chain = {
@@ -114,14 +87,22 @@ function getClient(chainId: number): PublicClient {
 
 // === Effects ===
 
+// Fallback only: urns are normally resolved from the UrnOwnerIndex entity
+// persisted on Open (see src/helpers/resolveUrn.ts). The call is pinned to the
+// event's block so a lagging RPC node can never answer for a not-yet-mined
+// urn, and a zero-address result is treated as an error (thrown, hence not
+// cached) so Envio retries instead of persisting a phantom urn.
+// The effect name is versioned so caches written by the old unpinned
+// `readOwnerUrns` effect can never be reused.
 export const readOwnerUrnsEffect = createEffect(
   {
-    name: 'readOwnerUrns',
+    name: 'readOwnerUrnsAtBlock',
     input: {
       chainId: S.int32,
       engineAddress: S.string,
       owner: S.string,
       index: S.bigint,
+      blockNumber: S.bigint,
     },
     output: S.string,
     rateLimit: { calls: 10, per: 'second' as const },
@@ -135,13 +116,21 @@ export const readOwnerUrnsEffect = createEffect(
         abi: ownerUrnsAbi,
         functionName: 'ownerUrns',
         args: [input.owner as Address, input.index],
+        blockNumber: input.blockNumber,
       });
-      return (result as string).toLowerCase();
+      const urn = (result as string).toLowerCase();
+      if (urn === ZERO_ADDRESS) {
+        throw new Error(
+          `ownerUrns(${input.owner}, ${input.index.toString()}) returned the zero address at block ${input.blockNumber.toString()}`,
+        );
+      }
+      return urn;
     } catch (error) {
       context.log.error('Failed to read ownerUrns', {
         engineAddress: input.engineAddress,
         owner: input.owner,
         index: input.index.toString(),
+        blockNumber: input.blockNumber.toString(),
         chainId: input.chainId.toString(),
         err: error,
       });
@@ -187,8 +176,8 @@ export const readCurvePoolCoinEffect = createEffect(
     cache: true,
   },
   async ({ input }) => {
+    const client = getClient(input.chainId);
     try {
-      const client = getClient(input.chainId);
       const result = await client.readContract({
         address: input.poolAddress as Address,
         abi: curveCoinsAbi,
@@ -198,84 +187,6 @@ export const readCurvePoolCoinEffect = createEffect(
       return (result as string).toLowerCase();
     } catch {
       return '0x0000000000000000000000000000000000000000';
-    }
-  },
-);
-
-// readDSChiefSlateEffect: returning '' on index out-of-bounds is the expected
-// loop termination signal used by createSlate/createSlateV2
-export const readDSChiefSlateEffect = createEffect(
-  {
-    name: 'readDSChiefSlate',
-    input: {
-      chainId: S.int32,
-      chiefAddress: S.string,
-      slateId: S.string,
-      index: S.bigint,
-    },
-    output: S.string,
-    rateLimit: { calls: 10, per: 'second' as const },
-    cache: true,
-  },
-  async ({ input }) => {
-    try {
-      const client = getClient(input.chainId);
-      const result = await client.readContract({
-        address: input.chiefAddress as Address,
-        abi: dsChiefSlatesAbi,
-        functionName: 'slates',
-        args: [input.slateId as `0x${string}`, input.index],
-      });
-      return (result as string).toLowerCase();
-    } catch {
-      // Index out of bounds = end of slate
-      return '';
-    }
-  },
-);
-
-export const readSpellDescriptionEffect = createEffect(
-  {
-    name: 'readSpellDescription',
-    input: { chainId: S.int32, spellAddress: S.string },
-    output: S.string,
-    rateLimit: { calls: 5, per: 'second' as const },
-    cache: true,
-  },
-  async ({ input }) => {
-    try {
-      const client = getClient(input.chainId);
-      const result = await client.readContract({
-        address: input.spellAddress as Address,
-        abi: dsSpellAbi,
-        functionName: 'description',
-      });
-      return result as string;
-    } catch {
-      return '';
-    }
-  },
-);
-
-export const readSpellExpirationEffect = createEffect(
-  {
-    name: 'readSpellExpiration',
-    input: { chainId: S.int32, spellAddress: S.string },
-    output: S.nullable(S.bigint),
-    rateLimit: { calls: 5, per: 'second' as const },
-    cache: true,
-  },
-  async ({ input }) => {
-    try {
-      const client = getClient(input.chainId);
-      const result = await client.readContract({
-        address: input.spellAddress as Address,
-        abi: dsSpellAbi,
-        functionName: 'expiration',
-      });
-      return result as bigint;
-    } catch {
-      return null;
     }
   },
 );

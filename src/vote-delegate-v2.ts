@@ -6,6 +6,9 @@ indexer.onEvent({ contract: 'VoteDelegateV2', event: 'Lock' }, async ({ event, c
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;
 
+  // a zero-wad lock leaves the delegation unchanged, so it must not move the count
+  if (amount === 0n) return;
+
   const delegate = await context.Delegate.get(
     `${event.chainId}-${delegateAddress}`,
   );
@@ -31,16 +34,15 @@ indexer.onEvent({ contract: 'VoteDelegateV2', event: 'Lock' }, async ({ event, c
     };
   }
 
-  // If previous delegation amount was 0, increment the delegators count
-  if (delegation.amount === 0n) {
+  const previousAmount = delegation.amount;
+  const newAmount = previousAmount + amount;
+
+  if (previousAmount <= 0n && newAmount > 0n) {
     updatedDelegate = {
       ...updatedDelegate,
       delegators: updatedDelegate.delegators + 1,
     };
   }
-
-  // Increase the total amount delegated
-  const newAmount = delegation.amount + amount;
   context.Delegation.set({
     ...delegation,
     amount: newAmount,
@@ -74,6 +76,9 @@ indexer.onEvent({ contract: 'VoteDelegateV2', event: 'Free' }, async ({ event, c
   const delegateAddress = event.srcAddress;
   const amount = event.params.wad;
 
+  // a zero-wad free leaves the delegation unchanged, so it must not move the count
+  if (amount === 0n) return;
+
   const delegate = await context.Delegate.get(
     `${event.chainId}-${delegateAddress}`,
   );
@@ -99,11 +104,10 @@ indexer.onEvent({ contract: 'VoteDelegateV2', event: 'Free' }, async ({ event, c
     };
   }
 
-  // Decrease the total amount delegated
-  const newAmount = delegation.amount - amount;
+  const previousAmount = delegation.amount;
+  const newAmount = previousAmount - amount;
 
-  // If the delegation amount is 0, decrement the delegators count
-  if (newAmount === 0n) {
+  if (previousAmount > 0n && newAmount <= 0n) {
     updatedDelegate = {
       ...updatedDelegate,
       delegators: updatedDelegate.delegators - 1,
