@@ -1,10 +1,5 @@
 import { BigDecimal } from 'envio';
 import type { Entity, EvmEvent, EvmOnEventContext } from 'envio';
-import {
-  readDSChiefSlateEffect,
-  readSpellDescriptionEffect,
-  readSpellExpirationEffect,
-} from './contractCalls';
 import { SpellState, ZERO_ADDRESS } from './constants';
 
 type Voter = Entity<'Voter'>;
@@ -65,75 +60,64 @@ export function createExecutiveVotingPowerChangeV2(
   };
 }
 
+// Builds the slate from the Etch event, which carries the full list of yays,
+// and creates a SpellV2 for every address on it without reading the contract.
+// Chief accepts any address in a slate, and no on-chain check tells a spell from
+// another contract, so the portal picks the official spells from the governance
+// list instead. Contract reads here could be failed, or made to fail, by any
+// address anyone etches.
 export async function createSlateV2(
-  slateID: string,
-  event: EvmEvent<'DSChiefV2', 'Vote'>,
+  event: EvmEvent<'DSChiefV2', 'Etch'>,
   context: EvmOnEventContext,
 ): Promise<SlateV2> {
   const yays: string[] = [];
-  const chiefAddress = event.srcAddress;
   const chainId = event.chainId;
 
-  // Read slate contents by iterating until empty string is returned (index out of bounds)
-  for (let i = 0n; ; i++) {
-    const spellAddress = await context.effect(readDSChiefSlateEffect, {
-      chainId,
-      chiefAddress,
-      slateId: slateID,
-      index: i,
-    });
-    if (!spellAddress) break;
-
+  for (const spellAddress of event.params.yays) {
     if (spellAddress !== ZERO_ADDRESS) {
       const spellId = `${chainId}-${spellAddress}`;
-      let spell = await context.SpellV2.get(spellId);
+      const spell = await context.SpellV2.get(spellId);
       if (!spell) {
-        const [description, expiryTime] = await Promise.all([
-          context.effect(readSpellDescriptionEffect, {
-            chainId,
-            spellAddress,
-          }),
-          context.effect(readSpellExpirationEffect, {
-            chainId,
-            spellAddress,
-          }),
-        ]);
-        // Only save the spell if expiration() didn't revert
-        // (matches original subgraph behavior)
-        if (expiryTime !== null) {
-          spell = {
-            id: spellId,
-            chainId,
-            address: spellAddress,
-            description,
-            state: SpellState.ACTIVE,
-            creationBlock: BigInt(event.block.number),
-            creationTime: BigInt(event.block.timestamp),
-            expiryTime,
-            totalVotes: 0n,
-            totalWeightedVotes: 0n,
-            castBlock: undefined,
-            castTime: undefined,
-            castTxnHash: undefined,
-            castWith: undefined,
-            liftedBlock: undefined,
-            liftedTime: undefined,
-            liftedTxnHash: undefined,
-            liftedWith: undefined,
-            scheduledBlock: undefined,
-            scheduledTime: undefined,
-            scheduledTxnHash: undefined,
-          };
-          context.SpellV2.set(spell);
-        }
+        context.SpellV2.set({
+          id: spellId,
+          chainId,
+          address: spellAddress,
+          description: undefined,
+          state: SpellState.ACTIVE,
+          creationBlock: BigInt(event.block.number),
+          creationTime: BigInt(event.block.timestamp),
+          expiryTime: undefined,
+          totalVotes: 0n,
+          totalWeightedVotes: 0n,
+          castBlock: undefined,
+          castTime: undefined,
+          castTxnHash: undefined,
+          castWith: undefined,
+          liftedBlock: undefined,
+          liftedTime: undefined,
+          liftedTxnHash: undefined,
+          liftedWith: undefined,
+          scheduledBlock: undefined,
+          scheduledTime: undefined,
+          scheduledTxnHash: undefined,
+        });
       }
       yays.push(spellId);
     }
   }
 
+  return saveSlateV2(event.params.slate, yays, event, context);
+}
+
+export function saveSlateV2(
+  slateHash: string,
+  yays: string[],
+  event: EvmEvent<'DSChiefV2', 'Etch'> | EvmEvent<'DSChiefV2', 'Vote'>,
+  context: EvmOnEventContext,
+): SlateV2 {
   const slate = {
-    id: `${chainId}-${slateID}`,
-    chainId,
+    id: `${event.chainId}-${slateHash}`,
+    chainId: event.chainId,
     yays,
     txnHash: event.transaction.hash,
     creationBlock: BigInt(event.block.number),

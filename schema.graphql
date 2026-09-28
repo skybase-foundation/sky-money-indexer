@@ -20,16 +20,16 @@ type SpellV2 {
   chainId: Int! @index
   "Spell contract address (without chainId prefix)"
   address: String!
-  "Spell description"
-  description: String!
+  "Spell description. Not indexed: SpellV2 is built from Chief events alone, with no contract reads"
+  description: String
   "State of the spell"
   state: SpellState!
   "Block number spell was created in"
   creationBlock: BigInt!
   "Timestamp of block spell was created in"
   creationTime: BigInt!
-  "Timestamp of spell expiry"
-  expiryTime: BigInt!
+  "Timestamp of spell expiry. Not indexed: SpellV2 is built from Chief events alone, with no contract reads"
+  expiryTime: BigInt
   "Transaction hash of Spell lift"
   liftedTxnHash: String
   "Block number spell was lifted in"
@@ -999,6 +999,21 @@ type StakingOnKick {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: String!
+}
+
+"""
+Lookup from (engine, owner, index) to the urn address, persisted on Open so
+later events (Lock, Free, SelectFarm, ...) never need to resolve the urn via RPC.
+"""
+type UrnOwnerIndex {
+  "chainId-engineAddress-owner-index"
+  id: ID!
+  chainId: Int! @index
+  engine: String!
+  owner: String! @index
+  index: BigInt!
+  "Urn address (without chainId prefix)"
+  urn: String!
 }
 
 type StakingUrn {

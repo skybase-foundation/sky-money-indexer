@@ -8,6 +8,11 @@ export async function getSealUrn(
   chainId: number,
   context: EvmOnEventContext,
 ): Promise<SealUrn> {
+  if (!urnAddress || urnAddress === ZERO_ADDRESS) {
+    // A zero urn address means the (owner, index) -> urn resolution failed.
+    // Throw so Envio retries the batch instead of persisting a phantom urn.
+    throw new Error(`Refusing to load urn with zero address on chain ${chainId}`);
+  }
   const id = `${chainId}-${urnAddress}`;
   let urn = await context.SealUrn.get(id);
   if (!urn) {

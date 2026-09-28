@@ -6,10 +6,8 @@ import {
   delegationFreeHandler,
 } from './helpers/delegates/index';
 import { getReward } from './helpers/getReward';
-import {
-  readOwnerUrnsEffect,
-  readMkrSkyRateEffect,
-} from './helpers/contractCalls';
+import { readMkrSkyRateEffect } from './helpers/contractCalls';
+import { resolveUrnAddress, saveUrnOwnerIndex } from './helpers/resolveUrn';
 import { ZERO_ADDRESS } from './helpers/constants';
 
 type Delegate = Entity<'Delegate'>;
@@ -21,6 +19,7 @@ const MKR_SKY_ADDRESSES: Record<number, string> = {
 };
 
 indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealOpen' }, async ({ event, context }) => {
+  saveUrnOwnerIndex(event, context);
   const urn = await getSealUrn(event.params.urn, event.chainId, context);
 
   const updatedUrn = {
@@ -47,12 +46,7 @@ indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealOpen' }, async ({ eve
 });
 
 indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealSelectVoteDelegate' }, async ({ event, context }) => {
-  const urnAddress = await context.effect(readOwnerUrnsEffect, {
-    chainId: event.chainId,
-    engineAddress: event.srcAddress,
-    owner: event.params.owner,
-    index: event.params.index,
-  });
+  const urnAddress = await resolveUrnAddress(event, context);
   let urn = await getSealUrn(urnAddress, event.chainId, context);
 
   const oldDelegateId = urn.voteDelegate_id;
@@ -121,6 +115,14 @@ indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealSelectVoteDelegate' }
         voteDelegate_id: newDelegate.id,
       });
 
+      // The engines revert on re-selecting the current delegate, so this only
+      // fires if the indexed urn disagrees with the chain. Running free then
+      // lock here would apply the lock to a copy of the delegate read before
+      // the free was written, inflating its total by the locked amount.
+      if (oldDelegate?.id === newDelegate.id) {
+        return;
+      }
+
       // handle delegation change
       if (oldDelegate && urn.mkrLocked > 0n) {
         await delegationFreeHandler(
@@ -157,12 +159,7 @@ indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealSelectVoteDelegate' }
 });
 
 indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealSelectFarm' }, async ({ event, context }) => {
-  const urnAddress = await context.effect(readOwnerUrnsEffect, {
-    chainId: event.chainId,
-    engineAddress: event.srcAddress,
-    owner: event.params.owner,
-    index: event.params.index,
-  });
+  const urnAddress = await resolveUrnAddress(event, context);
   let urn = await getSealUrn(urnAddress, event.chainId, context);
   let reward = await getReward(event.params.farm, event.chainId, context);
 
@@ -204,12 +201,7 @@ indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealDelFarm' }, async ({ 
 
 indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealLock' }, async ({ event, context }) => {
   const amount = event.params.wad;
-  const urnAddress = await context.effect(readOwnerUrnsEffect, {
-    chainId: event.chainId,
-    engineAddress: event.srcAddress,
-    owner: event.params.owner,
-    index: event.params.index,
-  });
+  const urnAddress = await resolveUrnAddress(event, context);
   let urn = await getSealUrn(urnAddress, event.chainId, context);
 
   const ref = Number(event.params.ref) || 0;
@@ -257,12 +249,7 @@ indexer.onEvent({ contract: 'LockstakeEngine', event: 'LockSky' }, async ({ even
 
   // Kick off both contract calls in parallel at the top of the handler
   const [urnAddress, rateMkrSky] = await Promise.all([
-    context.effect(readOwnerUrnsEffect, {
-      chainId: event.chainId,
-      engineAddress: event.srcAddress,
-      owner: event.params.owner,
-      index: event.params.index,
-    }),
+    resolveUrnAddress(event, context),
     mkrSkyAddress
       ? context.effect(readMkrSkyRateEffect, {
           chainId: event.chainId,
@@ -316,12 +303,7 @@ indexer.onEvent({ contract: 'LockstakeEngine', event: 'LockSky' }, async ({ even
 
 indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealFree' }, async ({ event, context }) => {
   const amount = event.params.wad;
-  const urnAddress = await context.effect(readOwnerUrnsEffect, {
-    chainId: event.chainId,
-    engineAddress: event.srcAddress,
-    owner: event.params.owner,
-    index: event.params.index,
-  });
+  const urnAddress = await resolveUrnAddress(event, context);
   let urn = await getSealUrn(urnAddress, event.chainId, context);
 
   context.SealFree.set({
@@ -368,12 +350,7 @@ indexer.onEvent({ contract: 'LockstakeEngine', event: 'FreeSky' }, async ({ even
 
   // Kick off both contract calls in parallel at the top of the handler
   const [urnAddress, rateMkrSky] = await Promise.all([
-    context.effect(readOwnerUrnsEffect, {
-      chainId: event.chainId,
-      engineAddress: event.srcAddress,
-      owner: event.params.owner,
-      index: event.params.index,
-    }),
+    resolveUrnAddress(event, context),
     mkrSkyAddress
       ? context.effect(readMkrSkyRateEffect, {
           chainId: event.chainId,
@@ -426,12 +403,7 @@ indexer.onEvent({ contract: 'LockstakeEngine', event: 'FreeSky' }, async ({ even
 
 indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealFreeNoFee' }, async ({ event, context }) => {
   const amount = event.params.wad;
-  const urnAddress = await context.effect(readOwnerUrnsEffect, {
-    chainId: event.chainId,
-    engineAddress: event.srcAddress,
-    owner: event.params.owner,
-    index: event.params.index,
-  });
+  const urnAddress = await resolveUrnAddress(event, context);
   let urn = await getSealUrn(urnAddress, event.chainId, context);
 
   context.SealFreeNoFee.set({
@@ -472,12 +444,7 @@ indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealFreeNoFee' }, async (
 });
 
 indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealDraw' }, async ({ event, context }) => {
-  const urnAddress = await context.effect(readOwnerUrnsEffect, {
-    chainId: event.chainId,
-    engineAddress: event.srcAddress,
-    owner: event.params.owner,
-    index: event.params.index,
-  });
+  const urnAddress = await resolveUrnAddress(event, context);
   let urn = await getSealUrn(urnAddress, event.chainId, context);
 
   context.SealDraw.set({
@@ -499,12 +466,7 @@ indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealDraw' }, async ({ eve
 });
 
 indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealWipe' }, async ({ event, context }) => {
-  const urnAddress = await context.effect(readOwnerUrnsEffect, {
-    chainId: event.chainId,
-    engineAddress: event.srcAddress,
-    owner: event.params.owner,
-    index: event.params.index,
-  });
+  const urnAddress = await resolveUrnAddress(event, context);
   let urn = await getSealUrn(urnAddress, event.chainId, context);
 
   context.SealWipe.set({
@@ -525,12 +487,7 @@ indexer.onEvent({ contract: 'LockstakeEngine', event: 'SealWipe' }, async ({ eve
 });
 
 indexer.onEvent({ contract: 'LockstakeEngine', event: 'GetReward' }, async ({ event, context }) => {
-  const urnAddress = await context.effect(readOwnerUrnsEffect, {
-    chainId: event.chainId,
-    engineAddress: event.srcAddress,
-    owner: event.params.owner,
-    index: event.params.index,
-  });
+  const urnAddress = await resolveUrnAddress(event, context);
   let urn = await getSealUrn(urnAddress, event.chainId, context);
 
   context.SealGetReward.set({
